@@ -2,6 +2,7 @@
 # pipeline's mode -- cascade or realtime, it is the same slot. The Anam key is
 # read in the runtime and never sent from here.
 
+import logging
 import os
 
 import zrt
@@ -10,6 +11,9 @@ from zrt.plugins import AnamAvatar, GeminiRealtime
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "anam-avatar-agent")

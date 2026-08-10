@@ -2,6 +2,7 @@
 # counterpart to vision_cascade.py, with identical mechanics. Room(vision=True)
 # subscribes the agent to the track; only the frame count crosses the wire.
 
+import logging
 import os
 
 import zrt
@@ -9,6 +10,9 @@ from zrt import Agent, Pipeline, Room, RoomMessage
 from zrt.plugins import GeminiRealtime
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "vision-realtime-agent")

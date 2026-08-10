@@ -3,6 +3,7 @@
 # own pipeline instance, since a pipeline carries the hooks registered on it.
 
 
+import logging
 import os
 
 import zrt
@@ -13,6 +14,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "travel")

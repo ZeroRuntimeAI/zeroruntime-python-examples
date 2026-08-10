@@ -2,6 +2,7 @@
 # STT_LLM_ONLY. No TTS, so the agent listens and answers in text without ever
 # speaking into the room.
 
+import logging
 import os
 
 import zrt
@@ -11,6 +12,8 @@ from zrt.plugins import DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+logger = logging.getLogger(__name__)
 
 AGENT_ID = os.getenv("AGENT_ID", "voice-to-text-agent")
 OUT_TOPIC = "AGENT_RESPONSE"

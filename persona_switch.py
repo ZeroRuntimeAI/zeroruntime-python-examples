@@ -27,6 +27,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
+logger = logging.getLogger(__name__)
 
 
 TOPIC = "CHAT"

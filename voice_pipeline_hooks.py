@@ -2,6 +2,8 @@
 # process and their return values are discarded, so they cost the turn nothing.
 # Only the observation hooks are shown, not the stream transforms.
 
+import logging
+
 import zrt
 from zrt import Agent, Pipeline, Room
 from zrt.inference import TurnDetector

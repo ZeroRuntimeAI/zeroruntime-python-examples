@@ -2,6 +2,7 @@
 # the TTS output and publishes it into the room as the agent's video. Nested
 # vendor config objects cross as plain dicts and are rebuilt in the runtime.
 
+import logging
 import os
 
 import zrt
@@ -11,6 +12,9 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD, SimliAva
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "avatar-agent")

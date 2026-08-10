@@ -2,6 +2,7 @@
 # captures the newest N frames. Room(vision=True) subscribes the agent to the
 # video track, and the pixels stay there -- only the count travels.
 
+import logging
 import os
 
 import zrt
@@ -11,6 +12,9 @@ from zrt.plugins import DeepgramSTT, CartesiaTTS, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "vision-agent")

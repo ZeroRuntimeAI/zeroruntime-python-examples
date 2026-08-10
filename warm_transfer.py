@@ -2,6 +2,7 @@
 # supervisor into a second room, brief them out loud, then bridge the caller
 # across. The result carries the phase it reached, since any of them can fail.
 
+import logging
 import os
 
 import zrt
@@ -20,6 +21,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "warm-transfer")

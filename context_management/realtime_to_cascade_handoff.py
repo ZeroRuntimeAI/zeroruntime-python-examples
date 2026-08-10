@@ -3,6 +3,7 @@
 # STT or a cheaper model. Same two traps -- detached, and idempotent.
 
 import asyncio
+import logging
 import os
 
 import zrt
@@ -12,6 +13,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GeminiRealtime, GoogleLLM, Sil
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+logger = logging.getLogger(__name__)
 
 AGENT_ID = os.getenv("AGENT_ID", "realtime-support")
 

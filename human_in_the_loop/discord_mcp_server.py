@@ -3,9 +3,12 @@
 # -- nothing here imports zrt, and discord is imported inside main.
 
 import asyncio
+import logging
 import os
 import sys
 
+
+logger = logging.getLogger(__name__)
 
 
 REPLY_TIMEOUT = float(os.getenv("HUMAN_REPLY_TIMEOUT", "240"))

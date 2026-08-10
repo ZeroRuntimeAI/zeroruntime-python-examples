@@ -2,6 +2,7 @@
 # is queued, and awaiting the handle it returns waits for the audio to drain. A
 # tool checking handle.interrupted can abandon work the caller talked over.
 import asyncio
+import logging
 
 import zrt
 from zrt import Agent, Pipeline, Room, UtteranceHandle, function_tool
@@ -10,6 +11,8 @@ from zrt.plugins import DeepgramSTT, CartesiaTTS, OpenAILLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+logger = logging.getLogger(__name__)
 
 AGENT_ID = "utterance-handle-agent"
 

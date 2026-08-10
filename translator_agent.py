@@ -2,6 +2,7 @@
 # language here and, when it changes, rebuilds the pipeline with a TTS that
 # speaks it. change_pipeline takes a complete pipeline, not a patch.
 
+import logging
 import os
 
 import zrt
@@ -11,6 +12,8 @@ from zrt.plugins import CartesiaTTS, OpenAILLM, SarvamAISTT, SarvamAITTS, Silero
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "translator-agent")

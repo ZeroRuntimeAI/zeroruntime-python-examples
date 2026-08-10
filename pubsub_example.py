@@ -3,6 +3,7 @@
 # at join, because the room does not exist until the agent has connected.
 
 import asyncio
+import logging
 import os
 
 import zrt
@@ -12,6 +13,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 TOPIC = "CHAT"

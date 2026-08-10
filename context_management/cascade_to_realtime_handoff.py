@@ -3,6 +3,7 @@
 # called it, and idempotent, since the new pipeline still has that tool.
 
 import asyncio
+import logging
 import os
 
 import zrt
@@ -11,6 +12,9 @@ from zrt.inference import TurnDetector
 from zrt.plugins import CartesiaTTS, DeepgramSTT, GeminiRealtime, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "support")

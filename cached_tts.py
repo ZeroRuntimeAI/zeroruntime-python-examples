@@ -2,6 +2,7 @@
 # the bytes and skips the TTS round trip. The audio must be PCM in the room's
 # format, and the text still travels because it goes into the chat context.
 
+import logging
 import os
 import pathlib
 
@@ -12,6 +13,9 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "cached-tts-agent")

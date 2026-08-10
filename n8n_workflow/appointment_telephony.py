@@ -2,6 +2,7 @@
 # trigger node -- same tools and same wire as a stdio server, different
 # transport. The pipeline is tuned for a phone caller. Needs the [mcp] extra.
 
+import logging
 import os
 
 import zrt
@@ -9,6 +10,8 @@ from zrt import Agent, EOUConfig, MCPServerHTTP, Pipeline, Room
 from zrt.inference import TurnDetector
 from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "appointment-agent")

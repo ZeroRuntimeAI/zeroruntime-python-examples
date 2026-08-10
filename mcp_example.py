@@ -2,6 +2,7 @@
 # your process -- a stdio server needs your files and credentials -- and the
 # discovered tools travel like any other. Needs the [mcp] extra.
 
+import logging
 import os
 import sys
 from pathlib import Path
@@ -14,6 +15,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "mcp-agent")

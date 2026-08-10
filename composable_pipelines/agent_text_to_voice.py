@@ -1,6 +1,7 @@
 # Text in, voice out -- Pipeline(llm=..., tts=...) infers LLM_TTS_ONLY. No STT
 # and no VAD, because the input is typed rather than spoken.
 
+import logging
 import os
 
 import zrt
@@ -9,6 +10,9 @@ from zrt.plugins import CartesiaTTS, GoogleLLM
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "text-to-voice-agent")

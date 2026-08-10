@@ -2,6 +2,7 @@
 # MCP tool whose server waits on a person, so session_timeout has to be minutes
 # rather than the vendor's 5s default meant for a local subprocess.
 
+import logging
 import os
 import pathlib
 import sys
@@ -10,6 +11,9 @@ import zrt
 from zrt import Agent, MCPServerStdio, Pipeline, Room
 from zrt.inference import TurnDetector
 from zrt.plugins import AnthropicLLM, DeepgramSTT, GoogleTTS, SileroVAD
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "customer-agent")

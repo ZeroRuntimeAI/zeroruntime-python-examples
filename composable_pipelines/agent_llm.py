@@ -2,6 +2,7 @@
 # pubsub topic and answers go out on another, so the agent does not read its
 # own replies back as new input.
 
+import logging
 import os
 
 import zrt
@@ -11,6 +12,8 @@ from zrt.plugins import GoogleLLM
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "llm-only-agent")

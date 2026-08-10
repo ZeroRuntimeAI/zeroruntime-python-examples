@@ -2,6 +2,7 @@
 # before the LLM sees them, an llm hook watching for goodbye intent, wake_up
 # nudges with a counter, and a duration cap with a spoken farewell.
 import asyncio
+import logging
 import re
 
 import zrt
@@ -13,6 +14,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = "lead-qualification-agent"

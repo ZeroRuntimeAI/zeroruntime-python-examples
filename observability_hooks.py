@@ -2,6 +2,7 @@
 # Room, platform recording, and the conversation history fetched in on_exit.
 # Traces and metrics default on; logs default off, because they are the noisy one.
 
+import logging
 import os
 
 import zrt
@@ -11,6 +12,9 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "observability-agent")

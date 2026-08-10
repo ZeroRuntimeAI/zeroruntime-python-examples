@@ -2,6 +2,7 @@
 # substitutions applied in the agent process between LLM and TTS, so nothing
 # crosses the wire per chunk and the turn pays nothing for them.
 
+import logging
 import os
 
 import zrt
@@ -12,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "enhanced-pronounciation")

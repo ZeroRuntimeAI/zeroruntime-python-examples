@@ -2,6 +2,7 @@
 # the handoff. inherit_context carries the conversation across, and add_handoff
 # records who moved them and why -- before the return, so it is inherited too.
 
+import logging
 import os
 
 import zrt
@@ -11,6 +12,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "intake")

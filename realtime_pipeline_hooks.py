@@ -2,12 +2,15 @@
 # cascade pipeline reports. Handlers run in this process and their return value
 # is discarded, so a slow one cannot stall a call.
 
+import logging
 import os
 
 import zrt
 from zrt import Agent, Pipeline, Room
 from zrt.plugins import GeminiRealtime
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "realtime-hooks-agent")

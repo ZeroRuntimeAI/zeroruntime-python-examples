@@ -2,6 +2,7 @@
 # or cuts it off mid-sentence. say, reply and process_text are three different
 # things; interrupt(force=True) also cuts uninterruptible utterances.
 
+import logging
 import os
 
 import zrt
@@ -12,6 +13,8 @@ from zrt.plugins import AnthropicLLM, DeepgramSTT, ElevenLabsTTS, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "reply-interrupt-agent")

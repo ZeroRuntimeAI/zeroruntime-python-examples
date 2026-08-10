@@ -2,6 +2,7 @@
 # startup. Three things change per language -- STT, TTS and instructions -- and
 # all three have to agree. For mid-call switching see translator_agent.py.
 
+import logging
 import os
 import sys
 
@@ -13,6 +14,8 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "multilang-loan-advisor")

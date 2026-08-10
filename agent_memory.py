@@ -2,6 +2,7 @@
 # just said and injects the hits as a system message; the exchange is written
 # back afterwards. The store is reached from this process, with your own key.
 
+import logging
 import os
 from typing import Optional
 
@@ -14,6 +15,9 @@ from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
+
+
+logger = logging.getLogger(__name__)
 
 
 AGENT_ID = os.getenv("AGENT_ID", "agent-memory")
