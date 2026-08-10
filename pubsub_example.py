@@ -94,12 +94,10 @@ async def chat_loop(session) -> None:
 
 
 def on_ready() -> None:
-    result = zrt.invoke(
+    zrt.invoke(
         os.getenv("AGENT_ID", "pubsub-example"),
         room=Room(name="PubSub", playground=True, subscribe=[TOPIC]),
     )
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
 
 
 if __name__ == "__main__":

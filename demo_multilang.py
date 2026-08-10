@@ -157,12 +157,10 @@ class MultilangLoanAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(
+    zrt.invoke(
         AGENT_ID, room=Room(
             name=f"Loan Advisor ({CFG['label']})", playground=True)
     )
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
 
 
 if __name__ == "__main__":

@@ -41,10 +41,8 @@ class HybridVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(AGENT_ID, room=Room(
+    zrt.invoke(AGENT_ID, room=Room(
         name="Hybrid TTS", playground=True))
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
 
 
 if __name__ == "__main__":

@@ -59,14 +59,12 @@ class ControllableAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(
+    zrt.invoke(
         AGENT_ID,
         room=Room(name="Reply / Interrupt",
                   playground=True, subscribe=[TOPIC]),
     )
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
-        logger.info("publish 'reply' or 'interrupt' on the %r topic", TOPIC)
+    logger.info("publish 'reply' or 'interrupt' on the %r topic", TOPIC)
 
 
 if __name__ == "__main__":

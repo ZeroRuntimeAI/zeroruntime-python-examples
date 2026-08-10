@@ -60,14 +60,12 @@ class LlmAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(
+    zrt.invoke(
         AGENT_ID,
         room=Room(name="LLM Only", playground=True, subscribe=[IN_TOPIC]),
     )
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
-        logger.info("publish text on %r; answers arrive on %r",
-                    IN_TOPIC, OUT_TOPIC)
+    logger.info("publish text on %r; answers arrive on %r",
+                IN_TOPIC, OUT_TOPIC)
 
 
 if __name__ == "__main__":

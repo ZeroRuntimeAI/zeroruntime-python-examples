@@ -53,10 +53,8 @@ class AvatarAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(AGENT_ID, room=Room(
+    zrt.invoke(AGENT_ID, room=Room(
         name="Avatar Agent", playground=True))
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
 
 
 if __name__ == "__main__":

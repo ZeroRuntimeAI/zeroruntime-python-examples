@@ -63,11 +63,9 @@ class VoiceToTextAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(AGENT_ID, room=Room(
+    zrt.invoke(AGENT_ID, room=Room(
         name="Voice to Text", playground=True))
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
-        logger.info("speak in the room; answers arrive on %r", OUT_TOPIC)
+    logger.info("speak in the room; answers arrive on %r", OUT_TOPIC)
 
 
 if __name__ == "__main__":

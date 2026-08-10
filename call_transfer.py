@@ -50,8 +50,8 @@ class CallTransferAgent(Agent):
 
 
 def invoke_agent() -> None:
-    print(zrt.invoke(AGENT_ID, room=Room(
-        name="Call Transfer Agent", playground=True))["playground_url"])
+    zrt.invoke(AGENT_ID, room=Room(
+        name="Call Transfer Agent", playground=True))
 
 
 if __name__ == "__main__":

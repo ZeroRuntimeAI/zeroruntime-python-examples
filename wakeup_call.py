@@ -42,8 +42,8 @@ class VoiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    print(zrt.invoke(AGENT_ID, room=Room(
-        name="Sandbox Agent", playground=True))["playground_url"])
+    zrt.invoke(AGENT_ID, room=Room(
+        name="Sandbox Agent", playground=True))
 
 
 if __name__ == "__main__":

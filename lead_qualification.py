@@ -159,8 +159,8 @@ class Lead(Agent):
 
 
 def invoke_agent() -> None:
-    print(zrt.invoke(AGENT_ID, room=Room(
-        name="Lead Qualification", playground=True))["playground_url"])
+    zrt.invoke(AGENT_ID, room=Room(
+        name="Lead Qualification", playground=True))
 
 
 if __name__ == "__main__":

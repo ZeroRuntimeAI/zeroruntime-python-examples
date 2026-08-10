@@ -82,7 +82,7 @@ class MyVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(
+    zrt.invoke(
         AGENT_ID,
         room=Room(
             name="Observability Hooks",
@@ -97,8 +97,6 @@ def on_ready() -> None:
             ),
         ),
     )
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
 
 
 if __name__ == "__main__":

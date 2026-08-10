@@ -55,7 +55,7 @@ class VisionAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(
+    zrt.invoke(
         AGENT_ID,
         room=Room(
             name="Vision Agent",
@@ -64,10 +64,8 @@ def on_ready() -> None:
             subscribe=[TOPIC],
         ),
     )
-    if "playground_url" in result:
-        logger.info("playground: %s", result["playground_url"])
-        logger.info(
-            "publish 'capture_frames' on the %r topic to trigger a look", TOPIC)
+    logger.info(
+        "publish 'capture_frames' on the %r topic to trigger a look", TOPIC)
 
 
 if __name__ == "__main__":
