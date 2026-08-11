@@ -144,7 +144,6 @@ Open it and talk to the agent. Ctrl-C to stop.
 | `call_transfer.py` | Moving the caller to another number |
 | `dtmf_voicemail.py` | Keypad input and answering-machine detection |
 | `agent_hangup.py` | The agent ending the call itself |
-| `lead_qualification.py` | An outbound call with transcript hooks and a duration cap |
 
 ### Room and observability
 
