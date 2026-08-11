@@ -14,14 +14,18 @@ before running it; that comment is the documentation.
 getting_started/   start here — the two pipeline modes, and tuning one
 pipelines/         which slots you fill, and what that makes the agent
 inference/         the same providers through the ZeroRuntime gateway
-tools/             function tools, MCP servers, humans in the loop
-context/           what the agent remembers, and handing it to another agent
+tools/             function tools, MCP servers, humans in the loop      *
+context/           what the agent remembers, and handing it to another  *
 speech/            what the agent says and when it stops saying it
 telephony/         phone-call control
-observability/     hooks, events, tracing, recording
+observability/     hooks, events, tracing, recording                    *
 vision/            showing the model what the camera sees
-avatars/           giving the agent a face
+avatars/           giving the agent a face                              *
 ```
+
+`*` — some examples in these folders need an account, an extra package or a
+running service. Those folders carry their own README with the steps;
+everything else runs on the setup below.
 
 ## Setup
 
