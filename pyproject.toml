@@ -1,0 +1,16 @@
+[project]
+name = "zeroruntime-examples"
+version = "0"
+requires-python = ">=3.10"
+
+# Keep in step with requirements.txt, which serves the pip/venv path.
+dependencies = [
+  "zeroruntime",
+  "python-dotenv",
+  "httpx",
+]
+
+[tool.uv]
+# Nothing here is importable as a package -- the examples are scripts run by
+# path. Without this, `uv sync` tries to build the directory and fails.
+package = false
