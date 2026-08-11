@@ -1,13 +1,15 @@
-# An Anam avatar on a speech-to-speech pipeline. An avatar is orthogonal to the
-# pipeline's mode -- cascade or realtime, it is the same slot. The Anam key is
-# read in the runtime and never sent from here.
+# An Anam avatar on a cascade pipeline -- avatar_simli_cascade.py with a
+# different vendor in the same slot. An avatar is orthogonal to the pipeline's
+# mode, so the swap touches nothing but the avatar line. The Anam key is read in
+# the runtime and never sent from here.
 
 import logging
 import os
 
 import zrt
 from zrt import Agent, Pipeline, Room, function_tool
-from zrt.plugins import AnamAvatar, GeminiRealtime
+from zrt.inference import TurnDetector
+from zrt.plugins import AnamAvatar, CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -58,17 +60,19 @@ class AvatarVoiceAgent(Agent):
 
         super().__init__(
             instructions=(
-                "You are an AI avatar voice agent with real-time capabilities. You "
-                "are a helpful virtual assistant with a visual avatar that can "
-                "answer questions about weather and help with other tasks."
+                "You are a helpful virtual assistant with a visual avatar that can "
+                "answer questions about weather and help with other tasks. Keep "
+                "replies short and conversational -- long monologues look wrong on "
+                "a talking head."
             ),
             agent_id=AGENT_ID,
             tools=[get_weather],
             pipeline=Pipeline(
-                realtime=GeminiRealtime(
-                    model="gemini-3.1-flash-live-preview",
-                    config={"voice": "Leda", "response_modalities": ["AUDIO"]},
-                ),
+                stt=DeepgramSTT(model="nova-2"),
+                llm=GoogleLLM(model="gemini-2.5-flash"),
+                tts=CartesiaTTS(),
+                vad=SileroVAD(),
+                turn_detector=TurnDetector(),
                 avatar=AnamAvatar(avatar_id=AVATAR_ID),
             ),
         )
