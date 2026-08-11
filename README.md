@@ -1,6 +1,6 @@
 # zeroruntime examples
 
-Runnable examples for the [zeroruntime](https://github.com/ZeroRuntimeAI/zeroruntime-py)
+Runnable examples for the [zeroruntime](https://zeroruntime.ai)
 Python SDK.
 
 Every file here is standalone. One file is one idea — a pipeline shape, a tool
