@@ -88,7 +88,7 @@ class AvatarVoiceAgent(Agent):
 
 def on_ready() -> None:
     zrt.invoke(AGENT_ID, room=Room(
-        name="Anam Avatar Agent", playground=True))
+        name="Anam Avatar", playground=True))
 
 
 if __name__ == "__main__":

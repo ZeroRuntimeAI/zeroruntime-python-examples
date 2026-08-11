@@ -62,7 +62,7 @@ def on_ready() -> None:
     zrt.invoke(
         AGENT_ID,
         room=Room(
-            name="Vision Agent",
+            name="Vision Cascade",
             playground=True,
             vision=True,
             subscribe=[TOPIC],

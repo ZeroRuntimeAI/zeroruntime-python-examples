@@ -49,7 +49,7 @@ class VoiceAgent(Agent):
 
 def invoke_agent() -> None:
     zrt.invoke(AGENT_ID, room=Room(
-        name="Cascade Agent", playground=True))
+        name="Cascade Basic", playground=True))
 
 
 if __name__ == "__main__":

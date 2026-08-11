@@ -44,7 +44,7 @@ class MyVoiceAgent(Agent):
 
 def on_ready() -> None:
     zrt.invoke(AGENT_ID, room=Room(
-        name="Gemini Realtime Agent", playground=True))
+        name="Realtime Basic", playground=True))
 
 
 if __name__ == "__main__":

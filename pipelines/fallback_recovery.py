@@ -49,7 +49,7 @@ class ResilientAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zrt.invoke(AGENT_ID, room=Room(name="Sandbox Agent", playground=True))
+    zrt.invoke(AGENT_ID, room=Room(name="Fallback Recovery", playground=True))
 
 
 if __name__ == "__main__":

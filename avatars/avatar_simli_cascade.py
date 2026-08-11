@@ -17,7 +17,7 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "avatar-agent")
+AGENT_ID = os.getenv("AGENT_ID", "simli-avatar-agent")
 FACE_ID = os.getenv("SIMLI_FACE_ID", "your-simli-face-id")
 
 
@@ -58,7 +58,7 @@ class AvatarAgent(Agent):
 
 def on_ready() -> None:
     zrt.invoke(AGENT_ID, room=Room(
-        name="Avatar Agent", playground=True))
+        name="Simli Avatar", playground=True))
 
 
 if __name__ == "__main__":
