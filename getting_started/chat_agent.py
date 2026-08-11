@@ -1,6 +1,6 @@
-# An agent you can type at: text from the room's chat is fed to it as though it
-# had been spoken, and a tool posts back. The chat topic is named at join,
-# because the room does not exist until the agent has connected.
+# An agent you only type at: Pipeline(llm=...) infers LLM_ONLY, so there is no
+# STT, TTS or VAD -- chat text goes in and a tool posts back. The chat topic is
+# named at join, because the room does not exist until the agent has connected.
 
 import asyncio
 import logging
@@ -8,7 +8,7 @@ import os
 
 import zrt
 from zrt import Agent, Participant, Pipeline, Room, RoomMessage, function_tool
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+from zrt.plugins import GoogleLLM
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -36,16 +36,11 @@ class ChatAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
             instructions=(
-                "You are a helpful assistant on a voice call. You can post "
+                "You are a helpful assistant in a room's text chat. You can post "
                 "messages to the room's chat when asked. Keep replies short."
             ),
             agent_id=os.getenv("AGENT_ID", "chat-agent"),
-            pipeline=Pipeline(
-                stt=DeepgramSTT(model="nova-2"),
-                llm=GoogleLLM(model="gemini-2.5-flash"),
-                tts=CartesiaTTS(),
-                vad=SileroVAD(),
-            ),
+            pipeline=Pipeline(llm=GoogleLLM(model="gemini-2.5-flash")),
             tools=[send_chat_message],
         )
 
