@@ -1,6 +1,8 @@
-# One loan-advisor agent in English, Hindi, Gujarati or Marathi, picked at
-# startup. Three things change per language -- STT, TTS and instructions -- and
-# all three have to agree. For mid-call switching see translator_agent.py.
+# One loan-advisor agent in English, Hindi, Gujarati or Marathi. A language is
+# picked at startup and the caller can change it mid-call: three things move per
+# language -- STT, TTS and instructions -- and all three have to agree, which is
+# what change_component does in one call. Sarvam speaks all four; Deepgram and
+# Cartesia have no Gujarati or Marathi to offer.
 
 import logging
 import os
@@ -9,7 +11,7 @@ import sys
 import zrt
 from zrt import Agent, Pipeline, Room, function_tool
 from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+from zrt.plugins import GoogleLLM, SarvamAISTT, SarvamAITTS, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -18,21 +20,24 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
+
 AGENT_ID = os.getenv("AGENT_ID", "multilang-loan-advisor")
 
 _BASE_PROMPT = (
     "You are a business loan advisor. Help the caller understand loan products, "
     "check eligibility, and work out an EMI. Use the tools rather than "
     "estimating. Keep answers short -- they are spoken aloud. Amounts are in "
-    "{currency}. Reply only in {label}."
+    "{currency}. Reply only in {label}. If the caller asks for another language, "
+    "or answers you in one, call switch_language and carry on in that language."
 )
 
+# Sarvam takes one language code for both ends of the call, so a language is a
+# code and the words that go with it.
 LANGUAGES: dict[str, dict] = {
     "en": {
         "label": "English",
-        "stt_language": "en",
-        "tts_language": "en",
-        "currency": "$ (US dollars)",
+        "code": "en-IN",
+        "currency": "₹ (rupees)",
         "greeting": (
             "Hi! I'm your business loan advisor. Want to hear about our loan "
             "products, check eligibility, or work out an EMI?"
@@ -40,8 +45,7 @@ LANGUAGES: dict[str, dict] = {
     },
     "hi": {
         "label": "Hindi",
-        "stt_language": "hi",
-        "tts_language": "hi",
+        "code": "hi-IN",
         "currency": "₹ (rupees)",
         "greeting": (
             "नमस्ते! मैं आपकी business loan advisor "
@@ -51,18 +55,16 @@ LANGUAGES: dict[str, dict] = {
     },
     "gu": {
         "label": "Gujarati",
-        "stt_language": "gu",
-        "tts_language": "gu",
+        "code": "gu-IN",
         "currency": "₹ (rupees)",
         "greeting": (
-            "નમસ्તે! હું તમારી business loan "
+            "નમસ્તે! હું તમારી business loan "
             "advisor છું."
         ),
     },
     "mr": {
         "label": "Marathi",
-        "stt_language": "mr",
-        "tts_language": "mr",
+        "code": "mr-IN",
         "currency": "₹ (rupees)",
         "greeting": (
             "नमस्कार! मी तुमची business loan "
@@ -77,6 +79,10 @@ if LANG not in LANGUAGES:
     raise SystemExit(
         f"unknown language {LANG!r}; pick one of {sorted(LANGUAGES)}")
 CFG = LANGUAGES[LANG]
+
+
+def _instructions(cfg: dict) -> str:
+    return _BASE_PROMPT.format(currency=cfg["currency"], label=cfg["label"])
 
 
 @function_tool
@@ -137,26 +143,53 @@ async def check_eligibility(
 
 class MultilangLoanAgent(Agent):
     def __init__(self) -> None:
+        self.lang = LANG
         super().__init__(
-            instructions=_BASE_PROMPT.format(
-                currency=CFG["currency"], label=CFG["label"]
-            ),
+            instructions=_instructions(CFG),
             agent_id=AGENT_ID,
             tools=[get_loan_products, calculate_emi, check_eligibility],
             pipeline=Pipeline(
-                stt=DeepgramSTT(model="nova-2", language=CFG["stt_language"]),
+                stt=SarvamAISTT(model="saaras:v3", language=CFG["code"]),
                 llm=GoogleLLM(model="gemini-2.5-flash"),
-                tts=CartesiaTTS(model="sonic-3", language=CFG["tts_language"]),
+                tts=SarvamAITTS(model="bulbul:v3", language=CFG["code"]),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
             ),
         )
 
+    @function_tool
+    async def switch_language(self, language: str) -> dict:
+        """Continue the call in another language.
+
+        Args:
+            language: "en", "hi", "gu" or "mr".
+        """
+        cfg = LANGUAGES.get(language)
+        if cfg is None:
+            return {
+                "error": f"no language called {language}",
+                "available": sorted(LANGUAGES),
+            }
+        if language == self.lang:
+            return {"already_speaking": cfg["label"]}
+
+        # The LLM, VAD and turn detector are the same in every language, so they
+        # are not named here and the swap leaves them running.
+        await self.session.change_component(
+            stt=SarvamAISTT(model="saaras:v3", language=cfg["code"]),
+            tts=SarvamAITTS(model="bulbul:v3", language=cfg["code"]),
+            instructions=_instructions(cfg),
+        )
+        logger.info("language switched %s -> %s",
+                    LANGUAGES[self.lang]["label"], cfg["label"])
+        self.lang = language
+        return {"switched_to": cfg["label"]}
+
     async def on_enter(self) -> None:
         await self.session.say(CFG["greeting"])
 
     async def on_exit(self) -> None:
-        logger.info("call finished in %s", CFG["label"])
+        logger.info("call finished in %s", LANGUAGES[self.lang]["label"])
 
 
 def on_ready() -> None:
