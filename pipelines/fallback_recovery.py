@@ -41,7 +41,7 @@ class ResilientAgent(Agent):
 
     async def on_enter(self) -> None:
         await self.session.say(
-            "Hello Buddy, Welcome to Videosdk's Voice AI Agent Framework."
+            "Hello Buddy, Welcome to ZeroRuntime's Voice AI Agent Framework."
         )
 
     async def on_exit(self) -> None:

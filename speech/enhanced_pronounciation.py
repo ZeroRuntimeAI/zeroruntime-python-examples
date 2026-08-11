@@ -22,7 +22,7 @@ RULES = [
     PronunciationRule("nginx", "engine x"),
     PronunciationRule("URL", "U R L"),
     PronunciationRule("API", "A P I"),
-    PronunciationRule("VideoSDK", "Video SDK"),
+    PronunciationRule("ZeroRuntime", "Zero Runtime"),
     PronunciationRule("HTTP", "H T T P"),
     PronunciationRule("HTTPS", "H T T P S"),
     PronunciationRule("JSON", "J SON"),

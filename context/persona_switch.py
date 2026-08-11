@@ -34,7 +34,7 @@ TOPIC = "CHAT"
 AGENT_ID = os.getenv("AGENT_ID", "persona-switch")
 
 _VOICE = (
-    "You are a general-purpose voice AI assistant powered by VideoSDK. "
+    "You are a general-purpose voice AI assistant powered by ZeroRuntime. "
     "You can answer any question, help with tasks, provide information, have "
     "casual conversations, and assist with anything the user needs. You are "
     "friendly, knowledgeable, concise, and natural in conversation. Keep "

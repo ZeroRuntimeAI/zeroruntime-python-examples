@@ -37,7 +37,7 @@ class VoiceAgent(Agent):
                 turn_detector=TurnDetector(),
             ),
             background_audio=BackgroundAudio(
-                file_path="https://cdn.videosdk.live/agent/voices/background/background-4.mp3",
+                file_path="https://cdn.zeroruntime.ai/zrt/bg-audio/bg-noise-1.ogg",
                 volume=0.9,
                 looping=True,
                 mode="mixing",
