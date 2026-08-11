@@ -6,7 +6,6 @@ requires-python = ">=3.10"
 # Keep in step with requirements.txt, which serves the pip/venv path.
 dependencies = [
   "zeroruntime",
-  "python-dotenv",
   "httpx",
 ]
 
