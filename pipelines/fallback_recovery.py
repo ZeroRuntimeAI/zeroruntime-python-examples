@@ -2,7 +2,6 @@
 # the head serves and the tail stands by. Every credential, standbys included,
 # is checked when the session starts rather than at failover.
 
-
 import zrt
 from zrt import Agent, Pipeline, Room
 from zrt.inference import TurnDetector
