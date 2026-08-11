@@ -1,6 +1,6 @@
-# The room around the call: a tool that publishes, a subscription that reacts,
-# and typed text fed to the agent as though it had been spoken. Topics are named
-# at join, because the room does not exist until the agent has connected.
+# An agent you can type at: text from the room's chat is fed to it as though it
+# had been spoken, and a tool posts back. The chat topic is named at join,
+# because the room does not exist until the agent has connected.
 
 import asyncio
 import logging
@@ -21,7 +21,7 @@ TOPIC = "CHAT"
 
 
 @function_tool
-async def send_pubsub_message(message: str) -> dict:
+async def send_chat_message(message: str) -> dict:
     """Send a message to everyone in the room. Use when the caller asks you to
     post, announce, or share something with the room.
 
@@ -32,21 +32,21 @@ async def send_pubsub_message(message: str) -> dict:
     return {"status": "sent", "topic": TOPIC}
 
 
-class PubSubAgent(Agent):
+class ChatAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
             instructions=(
                 "You are a helpful assistant on a voice call. You can post "
                 "messages to the room's chat when asked. Keep replies short."
             ),
-            agent_id=os.getenv("AGENT_ID", "pubsub-example"),
+            agent_id=os.getenv("AGENT_ID", "chat-agent"),
             pipeline=Pipeline(
                 stt=DeepgramSTT(model="nova-2"),
                 llm=GoogleLLM(model="gemini-2.5-flash"),
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
             ),
-            tools=[send_pubsub_message],
+            tools=[send_chat_message],
         )
 
     async def on_enter(self) -> None:
@@ -98,10 +98,10 @@ async def chat_loop(session) -> None:
 
 def on_ready() -> None:
     zrt.invoke(
-        os.getenv("AGENT_ID", "pubsub-example"),
-        room=Room(name="PubSub", playground=True, subscribe=[TOPIC]),
+        os.getenv("AGENT_ID", "chat-agent"),
+        room=Room(name="Chat Agent", playground=True, subscribe=[TOPIC]),
     )
 
 
 if __name__ == "__main__":
-    zrt.serve(PubSubAgent, on_ready=on_ready)
+    zrt.serve(ChatAgent, on_ready=on_ready)
