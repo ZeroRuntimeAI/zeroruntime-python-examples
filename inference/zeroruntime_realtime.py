@@ -1,6 +1,6 @@
-# A realtime model reached through the VideoSDK gateway, with no vendor key --
-# the realtime counterpart to videosdk_cascade_inference_agent.py. The gateway
-# class flattens the arguments the direct plugin nests; they are not the same class.
+# A realtime model reached through the ZeroRuntime gateway, with no vendor key --
+# the realtime counterpart to zeroruntime_cascade.py. The gateway class flattens
+# the arguments the direct plugin nests; they are not the same class.
 
 import os
 
@@ -12,7 +12,7 @@ load_dotenv(override=True)
 
 
 
-AGENT_ID = os.getenv("AGENT_ID", "videosdk-realtime-inference-agent")
+AGENT_ID = os.getenv("AGENT_ID", "zeroruntime-realtime-inference-agent")
 
 
 class MyVoiceAgent(Agent):
@@ -44,7 +44,7 @@ class MyVoiceAgent(Agent):
 def on_ready() -> None:
     zrt.invoke(
         AGENT_ID, room=Room(
-            name="VideoSDK Realtime Inference", playground=True)
+            name="ZeroRuntime Realtime Inference", playground=True)
     )
 
 

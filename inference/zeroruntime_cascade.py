@@ -1,6 +1,7 @@
-# A cascade through the VideoSDK inference gateway: the only difference from
-# cascade_basic.py is the import line, and the pipeline needs one credential
-# rather than one per vendor. VAD stays local -- there is no gateway twin.
+# A cascade through the ZeroRuntime inference gateway: the only difference from
+# getting_started/cascade_basic.py is the import line, and the pipeline needs one
+# credential rather than one per vendor. VAD stays local -- there is no gateway
+# twin.
 import zrt
 from zrt import Agent, Pipeline, Room
 from zrt.inference import CartesiaTTS, DeepgramSTT, GoogleLLM, TurnDetector
@@ -9,7 +10,7 @@ from zrt.plugins import SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
-AGENT_ID = "videosdk-cascade-inference-agent"
+AGENT_ID = "zeroruntime-cascade-inference-agent"
 
 
 class VoiceAgent(Agent):
