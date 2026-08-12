@@ -1,22 +1,31 @@
-# Ambience under the call: set on the agent to play from the start, or started
-# and stopped mid-call from the session. The file is resolved in the runtime,
-# and mixing mode keeps the track off the speech path.
+# Two sounds under the call, both on the room's mixing track.
+#
+#   thinking audio    plays while the LLM is generating, automatically, every turn
+#   background audio  plays when you ask for it, and keeps playing until you stop
+#
+# Both need Room(background_audio=True). That flag is the track itself, not the
+# sound: without it the runtime has nowhere to put audio that is not speech, and
+# both calls below are declined. Neither plays by itself -- the Room opens the
+# track, these two put something on it.
 
 import os
 
 import zrt
-from zrt import Agent, BackgroundAudio, Pipeline, Room, function_tool
-from zrt.inference import TurnDetector
-from zrt.plugins import DeepgramSTT, OpenAILLM, OpenAITTS, SileroVAD
+from zrt import Agent, Pipeline, Room, function_tool
+from zrt.inference import TurnDetector,GoogleLLM,SarvamAITTS
+from zrt.plugins import DeepgramSTT, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-
 AGENT_ID = os.getenv("AGENT_ID", "background-audio-agent")
 
+#: Any file libav can decode -- wav, mp3, ogg, flac, m4a -- fetched by the
+#: runtime, so a URL it can reach rather than a path on this machine. Leave
+#: either unset to take the runtime's own default sound.
 MUSIC = os.getenv("BACKGROUND_MUSIC", "")
+THINKING = os.getenv("THINKING_AUDIO", "")
 
 
 class VoiceAgent(Agent):
@@ -31,20 +40,15 @@ class VoiceAgent(Agent):
             agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
-                llm=OpenAILLM(),
-                tts=OpenAITTS(),
+                llm=GoogleLLM(),
+                tts=SarvamAITTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
-            ),
-            background_audio=BackgroundAudio(
-                file_path="https://cdn.zeroruntime.ai/zrt/bg-audio/bg-noise-1.ogg",
-                volume=0.9,
-                looping=True,
-                mode="mixing",
             ),
         )
 
     async def on_enter(self) -> None:
+        await self.session.set_thinking_audio(THINKING or None, volume=0.3)
         await self.session.say("Hello, how can I help you today?")
 
     async def on_exit(self) -> None:
@@ -62,6 +66,9 @@ class VoiceAgent(Agent):
                 MUSIC or None,
                 volume=0.8,
                 looping=True,
+                # False makes the music exclusive: the thinking sound is held
+                # back while it plays, rather than the two layering. True lets
+                # them overlap.
                 override_thinking=False,
             )
             return "Background music started."
@@ -74,8 +81,10 @@ class VoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
-        name="Background Audio", playground=True))
+    zrt.invoke(
+        AGENT_ID,
+        room=Room(name="Background Audio", playground=True, background_audio=True),
+    )
 
 
 if __name__ == "__main__":
