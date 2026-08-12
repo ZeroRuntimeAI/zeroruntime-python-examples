@@ -76,7 +76,7 @@ PERSONAS = {
         "Maya",
         stt=AssemblyAISTT(),
         llm=GoogleLLM(model="gemini-3-flash-preview"),
-        tts=DeepgramTTS(model="aura-2", voice="orion"),
+        tts=DeepgramTTS(model="aura-2"),
         **_TUNING,
     ),
     "google": _persona(
@@ -96,9 +96,7 @@ PERSONAS = {
     "realtime": _persona(
         "Ryan",
         realtime=GeminiRealtime(
-            model="gemini-3.1-flash-live-preview",
-            voice="Puck",
-            response_modalities=["AUDIO"],
+            model="gemini-3.1-flash-live-preview",        
         ),
     ),
 }
@@ -177,4 +175,4 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    zrt.serve(PersonaAgent, on_ready=on_ready, subscribe=[TOPIC])
+    zrt.serve(PersonaAgent, on_ready=on_ready)

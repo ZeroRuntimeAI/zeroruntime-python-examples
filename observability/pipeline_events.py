@@ -108,4 +108,4 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    zrt.serve(WatchedAgent, on_ready=on_ready, recording=True)
+    zrt.serve(WatchedAgent, on_ready=on_ready)
