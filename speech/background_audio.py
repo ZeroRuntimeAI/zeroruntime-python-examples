@@ -83,9 +83,9 @@ class VoiceAgent(Agent):
 def on_ready() -> None:
     zrt.invoke(
         AGENT_ID,
-        room=Room(name="Background Audio", playground=True, background_audio=True),
+        room=Room(name="Background Audio", playground=True),
     )
 
 
 if __name__ == "__main__":
-    zrt.serve(VoiceAgent, on_ready=on_ready)
+    zrt.serve(VoiceAgent, on_ready=on_ready, room=Room(background_audio=True))
