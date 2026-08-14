@@ -5,9 +5,9 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.plugins import CartesiaTTS, OpenAILLM, SarvamAISTT, SarvamAITTS, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.plugins import CartesiaTTS, OpenAILLM, SarvamAISTT, SarvamAITTS, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -20,7 +20,7 @@ AGENT_ID = os.getenv("AGENT_ID", "translator-agent")
 
 current_language = "en-IN"
 
-session: "zrt.Session | None" = None
+session: "zeroruntime.Session | None" = None
 
 pipeline = Pipeline(
     stt=SarvamAISTT(),
@@ -102,9 +102,9 @@ class TranslatorAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Translator Agent", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(TranslatorAgent, on_ready=on_ready)
+    zeroruntime.serve(TranslatorAgent, on_ready=on_ready)

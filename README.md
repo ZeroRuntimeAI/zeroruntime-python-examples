@@ -81,7 +81,7 @@ SIMLI_API_KEY=...         # SimliAvatar
 ANAM_API_KEY=...          # AnamAvatar
 ```
 
-Providers imported from `zrt.inference` reach the gateway instead of the vendor,
+Providers imported from `zeroruntime.inference` reach the gateway instead of the vendor,
 so they need `ZERORUNTIME_AUTH_TOKEN` and no vendor key at all — see
 `inference/zeroruntime_cascade.py`. `SileroVAD` runs locally and needs nothing.
 

@@ -2,10 +2,10 @@
 # getting_started/cascade_basic.py is the import line, and the pipeline needs one
 # credential rather than one per vendor. VAD stays local -- there is no gateway
 # twin.
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.inference import CartesiaTTS, DeepgramSTT, GoogleLLM, TurnDetector
-from zrt.plugins import SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.inference import CartesiaTTS, DeepgramSTT, GoogleLLM, TurnDetector
+from zeroruntime.plugins import SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -38,8 +38,8 @@ class VoiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zrt.invoke(AGENT_ID, room=Room(name="ZeroRuntime Cascade Inference", playground=True))
+    zeroruntime.invoke(AGENT_ID, room=Room(name="ZeroRuntime Cascade Inference", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(VoiceAgent, on_ready=invoke_agent)
+    zeroruntime.serve(VoiceAgent, on_ready=invoke_agent)

@@ -4,9 +4,9 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, RoomMessage
-from zrt.plugins import CartesiaTTS, GoogleLLM
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime.plugins import CartesiaTTS, GoogleLLM
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -45,7 +45,7 @@ class TextToVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID,
         room=Room(name="Text to Voice", playground=True, subscribe=[IN_TOPIC]),
     )
@@ -54,4 +54,4 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    zrt.serve(TextToVoiceAgent, on_ready=on_ready)
+    zeroruntime.serve(TextToVoiceAgent, on_ready=on_ready)

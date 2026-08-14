@@ -2,10 +2,10 @@
 # the head serves and the tail stands by. Every credential, standbys included,
 # is checked when the session starts rather than at failover.
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.inference import TurnDetector
-from zrt.plugins import (
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import (
     CartesiaTTS,
     GoogleLLM,
     DeepgramSTT,
@@ -49,8 +49,8 @@ class ResilientAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zrt.invoke(AGENT_ID, room=Room(name="Fallback Recovery", playground=True))
+    zeroruntime.invoke(AGENT_ID, room=Room(name="Fallback Recovery", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(ResilientAgent,on_ready=invoke_agent)
+    zeroruntime.serve(ResilientAgent,on_ready=invoke_agent)

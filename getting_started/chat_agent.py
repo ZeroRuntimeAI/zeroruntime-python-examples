@@ -6,9 +6,9 @@ import asyncio
 import logging
 import os
 
-import zrt
-from zrt import Agent, Participant, Pipeline, Room, RoomMessage, function_tool
-from zrt.plugins import GoogleLLM
+import zeroruntime
+from zeroruntime import Agent, Participant, Pipeline, Room, RoomMessage, function_tool
+from zeroruntime.plugins import GoogleLLM
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -28,7 +28,7 @@ async def send_chat_message(message: str) -> dict:
     Args:
         message: The text to post.
     """
-    await zrt.current_session().publish(TOPIC, message)
+    await zeroruntime.current_session().publish(TOPIC, message)
     return {"status": "sent", "topic": TOPIC}
 
 
@@ -92,11 +92,11 @@ async def chat_loop(session) -> None:
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         os.getenv("AGENT_ID", "chat-agent"),
         room=Room(name="Chat Agent", playground=True, subscribe=[TOPIC]),
     )
 
 
 if __name__ == "__main__":
-    zrt.serve(ChatAgent, on_ready=on_ready)
+    zeroruntime.serve(ChatAgent, on_ready=on_ready)

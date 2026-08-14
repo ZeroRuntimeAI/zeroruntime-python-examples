@@ -5,10 +5,10 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, EOUConfig, MCPServerHTTP, Pipeline, Room
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, EOUConfig, MCPServerHTTP, Pipeline, Room
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 
 logger = logging.getLogger(__name__)
@@ -72,9 +72,9 @@ class AppointmentAgent(Agent):
 
 
 async def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Restaurant Agent", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(AppointmentAgent, on_ready=on_ready)
+    zeroruntime.serve(AppointmentAgent, on_ready=on_ready)

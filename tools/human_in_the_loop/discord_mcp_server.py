@@ -1,6 +1,6 @@
 # The MCP server behind customer_agent.py: one stdio tool that posts the agent's
 # question into a Discord thread and blocks until somebody replies. Standalone
-# -- nothing here imports zrt, and discord is imported inside main.
+# -- nothing here imports zeroruntime, and discord is imported inside main.
 
 import asyncio
 import logging

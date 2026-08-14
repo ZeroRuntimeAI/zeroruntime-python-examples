@@ -6,10 +6,10 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -101,11 +101,11 @@ class WatchedAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID,
         room=Room(name="Pipeline Events", playground=True, recording=True),
     )
 
 
 if __name__ == "__main__":
-    zrt.serve(WatchedAgent, on_ready=on_ready)
+    zeroruntime.serve(WatchedAgent, on_ready=on_ready)

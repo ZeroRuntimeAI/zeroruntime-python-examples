@@ -7,10 +7,10 @@ import os
 import sys
 from pathlib import Path
 
-import zrt
-from zrt import Agent, MCPServerStdio, Pipeline, Room
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, MCPServerStdio, Pipeline, Room
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -68,8 +68,8 @@ class MCPAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(name="MCP Agent", playground=True))
+    zeroruntime.invoke(AGENT_ID, room=Room(name="MCP Agent", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(MCPAgent, on_ready=on_ready)
+    zeroruntime.serve(MCPAgent, on_ready=on_ready)

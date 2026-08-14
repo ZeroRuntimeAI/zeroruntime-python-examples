@@ -1,10 +1,10 @@
 # Moving the caller to another number with a transfer_call function tool.
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, function_tool
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, function_tool
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -50,9 +50,9 @@ class CallTransferAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Call Transfer Agent", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(CallTransferAgent, on_ready=invoke_agent)
+    zeroruntime.serve(CallTransferAgent, on_ready=invoke_agent)

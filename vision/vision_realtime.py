@@ -5,9 +5,9 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, RoomMessage
-from zrt.plugins import GeminiRealtime
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime.plugins import GeminiRealtime
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
@@ -56,7 +56,7 @@ class VisionRealtimeAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID,
         room=Room(
             name="Vision Realtime",
@@ -70,4 +70,4 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    zrt.serve(VisionRealtimeAgent, on_ready=on_ready)
+    zeroruntime.serve(VisionRealtimeAgent, on_ready=on_ready)

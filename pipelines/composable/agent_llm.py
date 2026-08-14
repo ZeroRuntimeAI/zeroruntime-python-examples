@@ -5,9 +5,9 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, RoomMessage
-from zrt.plugins import GoogleLLM
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime.plugins import GoogleLLM
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -22,7 +22,7 @@ OUT_TOPIC = "AGENT_RESPONSE"
 
 pipeline = Pipeline(llm=GoogleLLM())
 
-session: "zrt.Session | None" = None
+session: "zeroruntime.Session | None" = None
 
 
 @pipeline.on("llm")
@@ -63,7 +63,7 @@ class LlmAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID,
         room=Room(name="LLM Only", playground=True, subscribe=[IN_TOPIC]),
     )
@@ -72,4 +72,4 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    zrt.serve(LlmAgent, on_ready=on_ready)
+    zeroruntime.serve(LlmAgent, on_ready=on_ready)

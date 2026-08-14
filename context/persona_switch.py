@@ -5,10 +5,10 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, RoomMessage
-from zrt.core.tuning import EOUConfig, InterruptConfig
-from zrt.inference import (
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime.core.tuning import EOUConfig, InterruptConfig
+from zeroruntime.inference import (
     AssemblyAISTT,
     CartesiaTTS,
     DeepgramSTT,
@@ -21,7 +21,7 @@ from zrt.inference import (
     SarvamAITTS,
     TurnDetector,
 )
-from zrt.plugins import SileroVAD
+from zeroruntime.plugins import SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -168,11 +168,11 @@ class PersonaAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID, room=Room(name="Persona Switch",
                             playground=True, subscribe=[TOPIC])
     )
 
 
 if __name__ == "__main__":
-    zrt.serve(PersonaAgent, on_ready=on_ready)
+    zeroruntime.serve(PersonaAgent, on_ready=on_ready)

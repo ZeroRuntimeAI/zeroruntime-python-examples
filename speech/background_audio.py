@@ -10,10 +10,10 @@
 
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, function_tool
-from zrt.inference import TurnDetector,GoogleLLM,SarvamAITTS
-from zrt.plugins import DeepgramSTT, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, function_tool
+from zeroruntime.inference import TurnDetector,GoogleLLM,SarvamAITTS
+from zeroruntime.plugins import DeepgramSTT, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -81,11 +81,11 @@ class VoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID,
         room=Room(name="Background Audio", playground=True),
     )
 
 
 if __name__ == "__main__":
-    zrt.serve(VoiceAgent, on_ready=on_ready, room=Room(background_audio=True))
+    zeroruntime.serve(VoiceAgent, on_ready=on_ready, room=Room(background_audio=True))

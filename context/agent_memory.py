@@ -8,10 +8,10 @@ from typing import Optional
 
 import httpx
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -85,7 +85,7 @@ pipeline = Pipeline(
     turn_detector=TurnDetector(),
 )
 
-session: Optional[zrt.Session] = None
+session: Optional[zeroruntime.Session] = None
 pending_msg: Optional[str] = None
 
 
@@ -144,9 +144,9 @@ class PersonalAssistant(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Personal Assistant", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(PersonalAssistant, on_ready=on_ready)
+    zeroruntime.serve(PersonalAssistant, on_ready=on_ready)

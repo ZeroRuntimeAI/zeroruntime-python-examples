@@ -6,10 +6,10 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, function_tool
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, function_tool
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -131,9 +131,9 @@ class ToolChainingAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zrt.invoke(AGENT_ID, room=Room(
+    result = zeroruntime.invoke(AGENT_ID, room=Room(
         name="Tool Chaining", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(ToolChainingAgent, on_ready=on_ready)
+    zeroruntime.serve(ToolChainingAgent, on_ready=on_ready)

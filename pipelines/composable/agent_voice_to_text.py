@@ -5,10 +5,10 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.inference import TurnDetector
-from zrt.plugins import DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -25,7 +25,7 @@ pipeline = Pipeline(
     turn_detector=TurnDetector(),
 )
 
-session: "zrt.Session | None" = None
+session: "zeroruntime.Session | None" = None
 
 
 @pipeline.on("user_turn_start")
@@ -66,10 +66,10 @@ class VoiceToTextAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Voice to Text", playground=True))
     logger.info("speak in the room; answers arrive on %r", OUT_TOPIC)
 
 
 if __name__ == "__main__":
-    zrt.serve(VoiceToTextAgent, on_ready=on_ready)
+    zeroruntime.serve(VoiceToTextAgent, on_ready=on_ready)
