@@ -1,5 +1,5 @@
 # A small stdio MCP server, so mcp_example.py has something to connect to.
-# Standalone: nothing here imports zrt. Written against both the mcp package's
+# Standalone: nothing here imports zeroruntime. Written against both the mcp package's
 # 1.x and 2.x spellings of the server class.
 
 import datetime

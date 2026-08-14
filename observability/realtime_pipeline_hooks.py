@@ -5,9 +5,9 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.plugins import GeminiRealtime
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.plugins import GeminiRealtime
 
 
 logger = logging.getLogger(__name__)
@@ -74,9 +74,9 @@ class MyVoiceAgent(Agent):
 
 
 async def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Realtime Pipeline Hooks", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(MyVoiceAgent, on_ready=on_ready)
+    zeroruntime.serve(MyVoiceAgent, on_ready=on_ready)

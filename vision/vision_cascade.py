@@ -5,10 +5,10 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, RoomMessage
-from zrt.inference import TurnDetector
-from zrt.plugins import DeepgramSTT, CartesiaTTS, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import DeepgramSTT, CartesiaTTS, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -59,7 +59,7 @@ class VisionAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID,
         room=Room(
             name="Vision Cascade",
@@ -73,4 +73,4 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    zrt.serve(VisionAgent, on_ready=on_ready)
+    zeroruntime.serve(VisionAgent, on_ready=on_ready)

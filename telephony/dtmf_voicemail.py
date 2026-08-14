@@ -1,11 +1,11 @@
 # Keypad input and answering-machine detection, both declared on the agent with
 # their callbacks as methods.
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.core.agent import VoiceMail
-from zrt.inference import TurnDetector
-from zrt.plugins import DeepgramSTT, ElevenLabsTTS, OpenAILLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.core.agent import VoiceMail
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import DeepgramSTT, ElevenLabsTTS, OpenAILLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -47,9 +47,9 @@ class VoiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="DTMF Voicemail", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(VoiceAgent, on_ready=invoke_agent)
+    zeroruntime.serve(VoiceAgent, on_ready=invoke_agent)

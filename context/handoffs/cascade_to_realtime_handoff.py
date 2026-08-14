@@ -6,10 +6,10 @@ import asyncio
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room, function_tool
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GeminiRealtime, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, function_tool
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GeminiRealtime, GoogleLLM, SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
@@ -90,9 +90,9 @@ class SupportAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Cascade to Realtime", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(SupportAgent, on_ready=on_ready)
+    zeroruntime.serve(SupportAgent, on_ready=on_ready)

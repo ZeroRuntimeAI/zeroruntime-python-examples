@@ -4,16 +4,16 @@
 
 import os
 
-import zrt
-from zrt import Agent, Pipeline, Room
-from zrt.plugins import GeminiRealtime
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room
+from zeroruntime.plugins import GeminiRealtime
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
 
-AGENT_ID = os.getenv("AGENT_ID", "realtime-basic")
+AGENT_ID = os.getenv("AGENT_ID", "realtime-basicff")
 
 
 class MyVoiceAgent(Agent):
@@ -43,9 +43,8 @@ class MyVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Realtime Basic", playground=True))
 
-
 if __name__ == "__main__":
-    zrt.serve(MyVoiceAgent, on_ready=on_ready)
+    zeroruntime.serve(MyVoiceAgent, on_ready=on_ready)

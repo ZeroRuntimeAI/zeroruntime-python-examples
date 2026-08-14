@@ -7,10 +7,10 @@ import os
 import pathlib
 import sys
 
-import zrt
-from zrt import Agent, MCPServerStdio, Pipeline, Room
-from zrt.inference import TurnDetector
-from zrt.plugins import AnthropicLLM, DeepgramSTT, GoogleTTS, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, MCPServerStdio, Pipeline, Room
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import AnthropicLLM, DeepgramSTT, GoogleTTS, SileroVAD
 
 
 logger = logging.getLogger(__name__)
@@ -59,9 +59,9 @@ class CustomerAgent(Agent):
 
 
 async def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(AGENT_ID, room=Room(
         name="Customer Agent", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(CustomerAgent, on_ready=on_ready)
+    zeroruntime.serve(CustomerAgent, on_ready=on_ready)

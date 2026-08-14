@@ -6,10 +6,10 @@ import logging
 import os
 import pathlib
 
-import zrt
-from zrt import Agent, InterruptConfig, Pipeline, Room, function_tool
-from zrt.inference import TurnDetector
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, InterruptConfig, Pipeline, Room, function_tool
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -96,8 +96,8 @@ class SupportAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(name="Cached TTS", playground=True))
+    zeroruntime.invoke(AGENT_ID, room=Room(name="Cached TTS", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(SupportAgent, on_ready=on_ready)
+    zeroruntime.serve(SupportAgent, on_ready=on_ready)

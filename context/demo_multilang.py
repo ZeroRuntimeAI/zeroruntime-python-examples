@@ -8,10 +8,10 @@ import logging
 import os
 import sys
 
-import zrt
-from zrt import Agent, Pipeline, Room, function_tool
-from zrt.inference import TurnDetector
-from zrt.plugins import GoogleLLM, SarvamAISTT, SarvamAITTS, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, Room, function_tool
+from zeroruntime.inference import TurnDetector
+from zeroruntime.plugins import GoogleLLM, SarvamAISTT, SarvamAITTS, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -193,7 +193,7 @@ class MultilangLoanAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(
+    zeroruntime.invoke(
         AGENT_ID, room=Room(
             name=f"Loan Advisor ({CFG['label']})", playground=True)
     )
@@ -201,4 +201,4 @@ def on_ready() -> None:
 
 if __name__ == "__main__":
     logger.info("running in %s", CFG["label"])
-    zrt.serve(MultilangLoanAgent, on_ready=on_ready)
+    zeroruntime.serve(MultilangLoanAgent, on_ready=on_ready)

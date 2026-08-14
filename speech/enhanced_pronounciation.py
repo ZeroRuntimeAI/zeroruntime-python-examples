@@ -5,9 +5,9 @@
 import logging
 import os
 
-import zrt
-from zrt import Agent, Pipeline, PronunciationRule, Room
-from zrt.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+import zeroruntime
+from zeroruntime import Agent, Pipeline, PronunciationRule, Room
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -59,8 +59,8 @@ class DocsAgent(Agent):
 
 
 def on_ready() -> None:
-    zrt.invoke(AGENT_ID, room=Room(name="Pronunciation", playground=True))
+    zeroruntime.invoke(AGENT_ID, room=Room(name="Pronunciation", playground=True))
 
 
 if __name__ == "__main__":
-    zrt.serve(DocsAgent, on_ready=on_ready)
+    zeroruntime.serve(DocsAgent, on_ready=on_ready)
