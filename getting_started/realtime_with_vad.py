@@ -47,7 +47,7 @@ class MyVoiceAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(AGENT_ID, room=Room(
-        name="Realtime Basic Vad", playground=True,room_id="bfba-6wt9-vy94"))
+        name="Realtime Basic Vad", playground=True))
 
 if __name__ == "__main__":
     zeroruntime.serve(MyVoiceAgent, on_ready=on_ready)
