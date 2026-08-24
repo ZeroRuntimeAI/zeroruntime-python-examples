@@ -4,7 +4,7 @@
 # twin.
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
-from zeroruntime.inference import CartesiaTTS, DeepgramSTT, GoogleLLM, TurnDetector
+from zeroruntime.inference import CartesiaTTS, DeepgramSTT, GoogleLLM, TurnDetector,AICousticsDenoise
 from zeroruntime.plugins import SileroVAD
 
 from dotenv import load_dotenv
@@ -27,6 +27,7 @@ class VoiceAgent(Agent):
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
+                denoise=AICousticsDenoise(model_id="quail-vf-2.2-l-16khz")
             ),
         )
 
