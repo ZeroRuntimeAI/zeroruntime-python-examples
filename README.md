@@ -103,6 +103,7 @@ Open it and talk to the agent. Ctrl-C to stop.
 | --- | --- |
 | `getting_started/cascade_basic.py` | The smallest complete agent: STT, LLM, TTS, VAD, turn detector |
 | `getting_started/realtime_basic.py` | The same call with one speech-to-speech model doing all of it |
+| `getting_started/realtime_with_vad.py` | The same realtime call with VAD and denoise in front of the model |
 | `getting_started/cascade_advanced.py` | Tuning end-of-utterance and barge-in on a cascade pipeline |
 | `getting_started/chat_agent.py` | Typing at the agent — room chat in, chat back out |
 
@@ -166,6 +167,7 @@ Open it and talk to the agent. Ctrl-C to stop.
 | File | What it shows |
 | --- | --- |
 | `telephony/call_transfer.py` | Moving the caller to another number |
+| `telephony/warm_transfer.py` | Briefing a supervisor on hold, then bridging them in — needs a live SIP leg |
 | `telephony/dtmf_voicemail.py` | Keypad input and answering-machine detection |
 | `telephony/agent_hangup.py` | The agent ending the call itself |
 
