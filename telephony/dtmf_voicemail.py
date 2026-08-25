@@ -1,9 +1,8 @@
-# Keypad input and answering-machine detection, both declared on the agent with
-# their callbacks as methods.
+# Keypad input and answering-machine detection, both declared on the pipeline
+# alongside the providers, with their callbacks as agent methods.
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room
-from zeroruntime.core.agent import VoiceMail
+from zeroruntime import Agent, DTMFHandler, Pipeline, Room, VoiceMailDetector
 from zeroruntime.inference import TurnDetector
 from zeroruntime.plugins import DeepgramSTT, ElevenLabsTTS, OpenAILLM, SileroVAD
 
@@ -25,9 +24,9 @@ class VoiceAgent(Agent):
                 tts=ElevenLabsTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
+                dtmf_handler=DTMFHandler(),
+                voice_mail_detector=VoiceMailDetector(llm=OpenAILLM()),
             ),
-            dtmf_enabled=True,
-            voice_mail=VoiceMail(llm=OpenAILLM()),
         )
 
     async def on_enter(self) -> None:
