@@ -6,7 +6,7 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room, current_session
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
 from zeroruntime.core.tuning import EOUConfig, InterruptConfig
 from zeroruntime.inference import (
     AssemblyAISTT,
@@ -21,7 +21,7 @@ from zeroruntime.inference import (
     SarvamAITTS,
     TurnDetector,
 )
-from zeroruntime.plugins import SileroVAD
+from zeroruntime.plugins import GenerationConfig, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -70,7 +70,12 @@ PERSONAS = {
         "Alex",
         stt=DeepgramSTT(model="nova-2"),
         llm=GoogleLLM(model="gemini-3-flash-preview"),
-        tts=CartesiaTTS(model="sonic-3"),
+        # sonic-3 is what makes generation_config take effect: Cartesia only
+        # reads it on sonic-3+ and ignores it on earlier voices.
+        tts=CartesiaTTS(
+            model="sonic-3",
+            generation_config=GenerationConfig(speed=1.1, emotion="positivity"),
+        ),
         **_TUNING,
     ),
     "assembly": _persona(
@@ -105,9 +110,9 @@ PERSONAS = {
 FIRST = "deepgram"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
     """One frame on TOPIC, handed to whichever agent is running."""
-    await current_session().agent.on_chat(frame, backlog)
+    await session.agent.on_chat(frame, backlog)
 
 
 room = Room(name="Persona Switch", playground=True)

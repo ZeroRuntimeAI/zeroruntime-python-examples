@@ -11,7 +11,6 @@ from zeroruntime import (
     PubSubPublishConfig,
     PubSubSubscribeConfig,
     Room,
-    current_session,
     function_tool,
 )
 from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM
@@ -28,12 +27,16 @@ TOPIC = "CHAT"
 AGENT_ID = os.getenv("AGENT_ID", "chat-agent")
 
 
-async def on_pubsub_message(message: dict) -> None:
-    """One frame on TOPIC, as the transport delivered it."""
+async def on_pubsub_message(message: dict, backlog: bool, session) -> None:
+    """One frame on TOPIC, as the transport delivered it.
+
+    The third parameter is the live session, so this reaches the call without a
+    module-level lookup.
+    """
     logger.info("Pubsub message received: %s", message)
     text = str((message or {}).get("message") or "")
     if text.strip():
-        await current_session().process_text(text)
+        await session.process_text(text)
 
 
 #: The room the agent joins, and the topic it listens on.
@@ -44,7 +47,7 @@ pipeline = Pipeline(stt=DeepgramSTT(), llm=GoogleLLM(), tts=CartesiaTTS())
 
 
 @pipeline.on("llm")
-async def post_reply(data: dict) -> None:
+async def post_reply(data: dict, session) -> None:
     """Every answer the agent produces, echoed back into the chat.
 
     A plain coroutine on ``llm`` is handed the finished answer, which is the
@@ -52,7 +55,7 @@ async def post_reply(data: dict) -> None:
     """
     text = str((data or {}).get("text") or "").strip()
     if text:
-        await current_session().publish_to_pubsub(
+        await session.publish_to_pubsub(
             PubSubPublishConfig(topic=TOPIC, message=text)
         )
 

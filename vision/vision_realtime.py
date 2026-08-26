@@ -6,8 +6,8 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room, current_session
-from zeroruntime.plugins import GeminiRealtime
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
+from zeroruntime.plugins import GeminiLiveConfig, GeminiRealtime
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
@@ -19,9 +19,9 @@ AGENT_ID = os.getenv("AGENT_ID", "vision-realtime-agent")
 TOPIC = "vision"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
     """One frame on TOPIC, handed to whichever agent is running."""
-    await current_session().agent.on_chat(frame, backlog)
+    await session.agent.on_chat(frame, backlog)
 
 
 room = Room(name="Vision Realtime", playground=True, vision=True)
@@ -39,7 +39,9 @@ class VisionRealtimeAgent(Agent):
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
-                    config={"voice": "Leda", "response_modalities": ["AUDIO"]},
+                    config=GeminiLiveConfig(
+                        voice="Leda", response_modalities=["AUDIO"]
+                    ),
                 ),
             ),
         )

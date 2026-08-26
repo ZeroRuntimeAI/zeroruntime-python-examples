@@ -5,7 +5,7 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room, current_session
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
 from zeroruntime.plugins import CartesiaTTS, GoogleLLM
 
 from dotenv import load_dotenv
@@ -19,9 +19,9 @@ AGENT_ID = os.getenv("AGENT_ID", "text-to-voice-agent")
 IN_TOPIC = "CHAT"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
     """One frame on IN_TOPIC, handed to whichever agent is running."""
-    await current_session().agent.on_chat(frame, backlog)
+    await session.agent.on_chat(frame, backlog)
 
 
 room = Room(name="Text to Voice", playground=True)

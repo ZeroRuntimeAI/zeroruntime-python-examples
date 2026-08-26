@@ -9,7 +9,14 @@ import os
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, function_tool
 from zeroruntime.inference import TurnDetector
-from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GeminiRealtime, GoogleLLM, SileroVAD
+from zeroruntime.plugins import (
+    CartesiaTTS,
+    DeepgramSTT,
+    GeminiLiveConfig,
+    GeminiRealtime,
+    GoogleLLM,
+    SileroVAD,
+)
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
@@ -25,7 +32,9 @@ def make_realtime_pipeline() -> Pipeline:
     return Pipeline(
         realtime=GeminiRealtime(
             model="gemini-3.1-flash-live-preview",
-            config={"voice": "Leda", "response_modalities": ["AUDIO"]},
+            config=GeminiLiveConfig(
+                        voice="Leda", response_modalities=["AUDIO"]
+                    ),
         )
     )
 

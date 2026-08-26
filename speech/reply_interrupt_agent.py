@@ -6,7 +6,7 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room, current_session
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
 from zeroruntime.inference import TurnDetector
 from zeroruntime.plugins import AnthropicLLM, DeepgramSTT, ElevenLabsTTS, SileroVAD
 
@@ -21,9 +21,9 @@ AGENT_ID = os.getenv("AGENT_ID", "reply-interrupt-agent")
 TOPIC = "CHAT"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
     """One frame on TOPIC, handed to whichever agent is running."""
-    await current_session().agent.on_chat(frame, backlog)
+    await session.agent.on_chat(frame, backlog)
 
 
 room = Room(name="Reply / Interrupt", playground=True)

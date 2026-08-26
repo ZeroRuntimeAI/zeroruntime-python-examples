@@ -12,7 +12,6 @@ from zeroruntime import (
     PubSubPublishConfig,
     PubSubSubscribeConfig,
     Room,
-    current_session,
 )
 from zeroruntime.plugins import GoogleLLM
 
@@ -31,20 +30,20 @@ pipeline = Pipeline(llm=GoogleLLM())
 
 
 @pipeline.on("llm")
-async def on_llm(data: dict) -> None:
+async def on_llm(data: dict, session) -> None:
     """The agent's answer, as text. With no TTS this is the only output there is."""
     text = (data or {}).get("text", "")
     if not text.strip():
         return
     logger.info("agent: %s", text)
-    await current_session().publish_to_pubsub(
+    await session.publish_to_pubsub(
         PubSubPublishConfig(topic=OUT_TOPIC, message=text)
     )
 
 
-async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
     """One frame on IN_TOPIC, handed to whichever agent is running."""
-    await current_session().agent.on_chat(frame, backlog)
+    await session.agent.on_chat(frame, backlog)
 
 
 room = Room(name="LLM Only", playground=True)

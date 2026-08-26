@@ -8,7 +8,7 @@ import os
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
 from zeroruntime.inference import AICousticsDenoise
-from zeroruntime.plugins import GeminiRealtime,SileroVAD
+from zeroruntime.plugins import GeminiLiveConfig, GeminiRealtime, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -28,10 +28,10 @@ class MyVoiceAgent(Agent):
             pipeline=Pipeline(
                 llm=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
-                    config={
-                        "voice": "Leda",
-                        "response_modalities": ["AUDIO"],
-                    },
+                    config=GeminiLiveConfig(
+                        voice="Leda",
+                        response_modalities=["AUDIO"],
+                    ),
                 ),
                 vad=SileroVAD(),
                 denoise=AICousticsDenoise(model_id="quail-vf-2.2-l-16khz"),
