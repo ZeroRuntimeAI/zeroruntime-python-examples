@@ -5,7 +5,7 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room, current_session
 from zeroruntime.plugins import CartesiaTTS, GoogleLLM
 
 from dotenv import load_dotenv
@@ -17,6 +17,16 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = os.getenv("AGENT_ID", "text-to-voice-agent")
 IN_TOPIC = "CHAT"
+
+
+async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+    """One frame on IN_TOPIC, handed to whichever agent is running."""
+    await current_session().agent.on_chat(frame, backlog)
+
+
+room = Room(name="Text to Voice", playground=True)
+room.subscribe_to_pubsub(PubSubSubscribeConfig(
+    topic=IN_TOPIC, cb=on_pubsub_message))
 
 
 class TextToVoiceAgent(Agent):
@@ -31,14 +41,17 @@ class TextToVoiceAgent(Agent):
         )
 
     async def on_enter(self) -> None:
+        # Subscribing replays the topic's history, so the handler takes the
+        # backlog flag and ignores anything typed before the agent joined.
         await self.session.say("Hello. Type something and I will read my answer aloud.")
 
-    async def on_message(self, message: RoomMessage) -> None:
-        if message.backlog or message.topic != IN_TOPIC or not message.text.strip():
+    async def on_chat(self, frame: dict, backlog: bool) -> None:
+        text = str(frame.get("message") or "")
+        if backlog or not text.strip():
             return
 
-        logger.info("user typed: %s", message.text)
-        await self.session.process_text(message.text)
+        logger.info("user typed: %s", text)
+        await self.session.process_text(text)
 
     async def on_exit(self) -> None:
         logger.info("call finished")
@@ -47,7 +60,7 @@ class TextToVoiceAgent(Agent):
 def on_ready() -> None:
     zeroruntime.invoke(
         AGENT_ID,
-        room=Room(name="Text to Voice", playground=True, subscribe=[IN_TOPIC]),
+        room=room,
     )
     logger.info(
         "publish text on the %r topic to hear it answered", IN_TOPIC)

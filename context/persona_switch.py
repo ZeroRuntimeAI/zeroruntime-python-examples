@@ -6,7 +6,7 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room, current_session
 from zeroruntime.core.tuning import EOUConfig, InterruptConfig
 from zeroruntime.inference import (
     AssemblyAISTT,
@@ -45,8 +45,9 @@ _VOICE = (
 _TUNING = dict(
     vad=SileroVAD(),
     turn_detector=TurnDetector(),
-    eou=EOUConfig(mode="ADAPTIVE", min_max_speech_wait_timeout=[0.1, 0.5]),
-    interrupt=InterruptConfig(
+    eou_config=EOUConfig(
+        mode="ADAPTIVE", min_max_speech_wait_timeout=[0.1, 0.5]),
+    interrupt_config=InterruptConfig(
         mode="HYBRID",
         interrupt_min_duration=0.2,
         interrupt_min_words=2,
@@ -96,12 +97,22 @@ PERSONAS = {
     "realtime": _persona(
         "Ryan",
         realtime=GeminiRealtime(
-            model="gemini-3.1-flash-live-preview",        
+            model="gemini-3.1-flash-live-preview",
         ),
     ),
 }
 
 FIRST = "deepgram"
+
+
+async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+    """One frame on TOPIC, handed to whichever agent is running."""
+    await current_session().agent.on_chat(frame, backlog)
+
+
+room = Room(name="Persona Switch", playground=True)
+room.subscribe_to_pubsub(PubSubSubscribeConfig(
+    topic=TOPIC, cb=on_pubsub_message))
 
 
 class PersonaAgent(Agent):
@@ -126,11 +137,11 @@ class PersonaAgent(Agent):
             f"Hey! {PERSONAS[self._current]['name']} here -- what can I help with?"
         )
 
-    async def on_message(self, message: RoomMessage) -> None:
+    async def on_chat(self, frame: dict, backlog: bool) -> None:
         """A persona name in the room chat switches the pipeline."""
-        if message.backlog:
+        if backlog:
             return
-        key = message.text.strip().lower()
+        key = str(frame.get("message") or "").strip().lower()
         if key not in PERSONAS:
             logger.info("ignoring unknown persona: %r", key)
             return
@@ -169,8 +180,7 @@ class PersonaAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(
-        AGENT_ID, room=Room(name="Persona Switch",
-                            playground=True, subscribe=[TOPIC])
+        AGENT_ID, room=room
     )
 
 

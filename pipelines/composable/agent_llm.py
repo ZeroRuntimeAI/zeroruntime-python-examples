@@ -6,7 +6,14 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime import (
+    Agent,
+    Pipeline,
+    PubSubPublishConfig,
+    PubSubSubscribeConfig,
+    Room,
+    current_session,
+)
 from zeroruntime.plugins import GoogleLLM
 
 from dotenv import load_dotenv
@@ -22,17 +29,27 @@ OUT_TOPIC = "AGENT_RESPONSE"
 
 pipeline = Pipeline(llm=GoogleLLM())
 
-session: "zeroruntime.Session | None" = None
-
 
 @pipeline.on("llm")
 async def on_llm(data: dict) -> None:
     """The agent's answer, as text. With no TTS this is the only output there is."""
     text = (data or {}).get("text", "")
-    if not text.strip() or session is None:
+    if not text.strip():
         return
     logger.info("agent: %s", text)
-    await session.publish(OUT_TOPIC, text)
+    await current_session().publish_to_pubsub(
+        PubSubPublishConfig(topic=OUT_TOPIC, message=text)
+    )
+
+
+async def on_pubsub_message(frame: dict, backlog: bool) -> None:
+    """One frame on IN_TOPIC, handed to whichever agent is running."""
+    await current_session().agent.on_chat(frame, backlog)
+
+
+room = Room(name="LLM Only", playground=True)
+room.subscribe_to_pubsub(PubSubSubscribeConfig(
+    topic=IN_TOPIC, cb=on_pubsub_message))
 
 
 class LlmAgent(Agent):
@@ -45,18 +62,15 @@ class LlmAgent(Agent):
             pipeline=pipeline,
         )
 
-    async def on_enter(self) -> None:
-        global session
-        session = self.session
-
-    async def on_message(self, message: RoomMessage) -> None:
-        if message.backlog or message.topic != IN_TOPIC:
-            return
-        if not message.text.strip():
+    async def on_chat(self, frame: dict, backlog: bool) -> None:
+        """One frame on IN_TOPIC. The second parameter is what keeps the agent
+        from answering everything typed before it joined."""
+        text = str(frame.get("message") or "")
+        if backlog or not text.strip():
             return
 
-        logger.info("user: %s", message.text)
-        await self.session.process_text(message.text)
+        logger.info("user: %s", text)
+        await self.session.process_text(text)
 
     async def on_exit(self) -> None:
         logger.info("call finished")
@@ -65,7 +79,7 @@ class LlmAgent(Agent):
 def on_ready() -> None:
     zeroruntime.invoke(
         AGENT_ID,
-        room=Room(name="LLM Only", playground=True, subscribe=[IN_TOPIC]),
+        room=room,
     )
     logger.info("publish text on %r; answers arrive on %r",
                 IN_TOPIC, OUT_TOPIC)

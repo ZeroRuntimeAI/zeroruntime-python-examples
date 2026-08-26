@@ -6,7 +6,7 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room
+from zeroruntime import Agent, Pipeline, PubSubPublishConfig, Room, current_session
 from zeroruntime.inference import TurnDetector
 from zeroruntime.plugins import DeepgramSTT, GoogleLLM, SileroVAD
 
@@ -25,9 +25,6 @@ pipeline = Pipeline(
     turn_detector=TurnDetector(),
 )
 
-session: "zeroruntime.Session | None" = None
-
-
 @pipeline.on("user_turn_start")
 async def on_user_turn_start(transcript: str) -> None:
     """What the caller said, as soon as they stopped saying it."""
@@ -39,10 +36,12 @@ async def on_llm(data: dict) -> None:
     """The agent's answer. With no TTS this is the only output there is --
     without publishing it somewhere, this agent would think in silence."""
     text = (data or {}).get("text", "")
-    if not text.strip() or session is None:
+    if not text.strip():
         return
     logger.info("answer: %s", text)
-    await session.publish(OUT_TOPIC, text)
+    await current_session().publish_to_pubsub(
+        PubSubPublishConfig(topic=OUT_TOPIC, message=text)
+    )
 
 
 class VoiceToTextAgent(Agent):
@@ -57,8 +56,6 @@ class VoiceToTextAgent(Agent):
         )
 
     async def on_enter(self) -> None:
-        global session
-        session = self.session
         logger.info("listening")
 
     async def on_exit(self) -> None:

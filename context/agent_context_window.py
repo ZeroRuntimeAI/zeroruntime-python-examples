@@ -32,7 +32,7 @@ pipeline = Pipeline(
 )
 
 
-@pipeline.on("metrics.llm")
+@pipeline.metrics.on("llm")
 def on_llm_metrics(data: dict) -> None:
     """Worth watching here: compaction costs a model call on the turn it fires."""
     logger.info("llm %s", data)
