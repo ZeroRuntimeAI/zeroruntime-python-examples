@@ -29,17 +29,17 @@ pipeline = Pipeline(
 )
 
 
-@pipeline.on("metrics.stt")
+@pipeline.metrics.on("stt")
 def on_stt_metrics(data: dict) -> None:
     logger.info("stt %s", data)
 
 
-@pipeline.on("metrics.llm")
+@pipeline.metrics.on("llm")
 def on_llm_metrics(data: dict) -> None:
     logger.info("llm %s", data)
 
 
-@pipeline.on("metrics.tts")
+@pipeline.metrics.on("tts")
 def on_tts_metrics(data: dict) -> None:
     logger.info("tts %s", data)
 

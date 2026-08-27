@@ -6,7 +6,7 @@ import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
-from zeroruntime.plugins import GeminiRealtime, SarvamAISTT, SileroVAD
+from zeroruntime.plugins import GeminiLiveConfig, GeminiRealtime, SarvamAISTT, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -27,7 +27,9 @@ class AdditionalSTTAndRealtime(Agent):
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
-                    config={"voice": "Leda", "response_modalities": ["AUDIO"]},
+                    config=GeminiLiveConfig(
+                        voice="Leda", response_modalities=["AUDIO"]
+                    ),
                 ),
                 stt=SarvamAISTT(),
                 vad=SileroVAD(),

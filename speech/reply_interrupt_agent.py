@@ -6,9 +6,9 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
 from zeroruntime.inference import TurnDetector
-from zeroruntime.plugins import AnthropicLLM, DeepgramSTT, ElevenLabsTTS, SileroVAD
+from zeroruntime.plugins import GoogleLLM, DeepgramSTT, CartesiaTTS, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -21,6 +21,9 @@ AGENT_ID = os.getenv("AGENT_ID", "reply-interrupt-agent")
 TOPIC = "CHAT"
 
 
+room = Room(name="Reply / Interrupt", playground=True)
+
+
 class ControllableAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
@@ -31,21 +34,25 @@ class ControllableAgent(Agent):
             agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
-                llm=AnthropicLLM(),
-                tts=ElevenLabsTTS(),
+                llm=GoogleLLM(),
+                tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
             ),
         )
 
     async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=TOPIC, cb=self.on_chat)
+        )
         await self.session.say("Hello, how can I help you today?")
 
-    async def on_message(self, message: RoomMessage) -> None:
-        if message.backlog or message.topic != TOPIC:
+    async def on_chat(self, frame: dict, backlog: bool) -> None:
+        if backlog:
             return
+        command = str(frame.get("message") or "")
 
-        if message.text == "reply":
+        if command == "reply":
             logger.info("replying")
             handle = await self.session.reply(
                 "Create a random number between 1 and 100. Tell the user a joke "
@@ -53,7 +60,7 @@ class ControllableAgent(Agent):
             )
             logger.info("utterance %s started", handle.utterance_id)
 
-        elif message.text == "interrupt":
+        elif command == "interrupt":
             logger.info("interrupting")
             await self.session.interrupt()
 
@@ -64,8 +71,7 @@ class ControllableAgent(Agent):
 def on_ready() -> None:
     zeroruntime.invoke(
         AGENT_ID,
-        room=Room(name="Reply / Interrupt",
-                  playground=True, subscribe=[TOPIC]),
+        room=room,
     )
     logger.info("publish 'reply' or 'interrupt' on the %r topic", TOPIC)
 

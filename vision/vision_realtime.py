@@ -6,8 +6,8 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room, RoomMessage
-from zeroruntime.plugins import GeminiRealtime
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
+from zeroruntime.plugins import GeminiLiveConfig, GeminiRealtime
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = os.getenv("AGENT_ID", "vision-realtime-agent")
 TOPIC = "vision"
+
+
+room = Room(name="Vision Realtime", playground=True, vision=True)
 
 
 class VisionRealtimeAgent(Agent):
@@ -30,18 +33,21 @@ class VisionRealtimeAgent(Agent):
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
-                    config={"voice": "Leda", "response_modalities": ["AUDIO"]},
+                    config=GeminiLiveConfig(
+                        voice="Leda", response_modalities=["AUDIO"]
+                    ),
                 ),
             ),
         )
 
     async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=TOPIC, cb=self.on_chat)
+        )
         await self.session.say("Hello! Show me something and I'll tell you what I see.")
 
-    async def on_message(self, message: RoomMessage) -> None:
-        if message.backlog or message.topic != TOPIC:
-            return
-        if message.text != "capture_frames":
+    async def on_chat(self, frame: dict, backlog: bool) -> None:
+        if backlog or str(frame.get("message") or "") != "capture_frames":
             return
 
         logger.info("capturing frames")
@@ -58,12 +64,7 @@ class VisionRealtimeAgent(Agent):
 def on_ready() -> None:
     zeroruntime.invoke(
         AGENT_ID,
-        room=Room(
-            name="Vision Realtime",
-            playground=True,
-            vision=True,
-            subscribe=[TOPIC],
-        ),
+        room=room,
     )
     logger.info(
         "publish 'capture_frames' on the %r topic to trigger a look", TOPIC)

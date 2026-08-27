@@ -54,8 +54,8 @@ class AppointmentAgent(Agent):
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
-                eou=EOUConfig(mode="ADAPTIVE",
-                              min_max_speech_wait_timeout=[0.6, 1.4]),
+                eou_config=EOUConfig(mode="ADAPTIVE",
+                                     min_max_speech_wait_timeout=[0.6, 1.4]),
             ),
         )
 
@@ -71,7 +71,7 @@ class AppointmentAgent(Agent):
         logger.info("call finished")
 
 
-async def on_ready() -> None:
+def on_ready() -> None:
     zeroruntime.invoke(AGENT_ID, room=Room(
         name="Restaurant Agent", playground=True))
 

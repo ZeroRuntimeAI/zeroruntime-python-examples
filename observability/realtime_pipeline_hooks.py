@@ -7,7 +7,7 @@ import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
-from zeroruntime.plugins import GeminiRealtime
+from zeroruntime.plugins import GeminiLiveConfig, GeminiRealtime
 
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,9 @@ AGENT_ID = os.getenv("AGENT_ID", "realtime-hooks-agent")
 pipeline = Pipeline(
     realtime=GeminiRealtime(
         model="gemini-3.1-flash-live-preview",
-        config={"voice": "Leda", "response_modalities": ["AUDIO"]},
+        config=GeminiLiveConfig(
+                        voice="Leda", response_modalities=["AUDIO"]
+                    ),
     )
 )
 
@@ -73,7 +75,7 @@ class MyVoiceAgent(Agent):
         await self.session.say("Goodbye!")
 
 
-async def on_ready() -> None:
+def on_ready() -> None:
     zeroruntime.invoke(AGENT_ID, room=Room(
         name="Realtime Pipeline Hooks", playground=True))
 

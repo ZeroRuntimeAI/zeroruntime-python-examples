@@ -67,13 +67,13 @@ def on_recording_failed(data: dict) -> None:
     logger.error("recording FAILED: %s", data.get("error", ""))
 
 
-@pipeline.on("metrics.stt")
+@pipeline.metrics.on("stt")
 def on_stt_metrics(data: dict) -> None:
     logger.info("stt metric collector  %s", data)
     logger.info("stt %s", data)
 
 
-@pipeline.on("metrics.llm")
+@pipeline.metrics.on("llm")
 def on_llm_metrics(data: dict) -> None:
     """Time-to-first-token, per turn, while the call is still running.
 

@@ -6,7 +6,7 @@ import logging
 import os
 
 import zeroruntime
-from zeroruntime import Agent, Pipeline, Room, RoomMessage
+from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
 from zeroruntime.inference import TurnDetector
 from zeroruntime.plugins import DeepgramSTT, CartesiaTTS, GoogleLLM, SileroVAD
 
@@ -19,6 +19,9 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = os.getenv("AGENT_ID", "vision-agent")
 TOPIC = "CHAT"
+
+
+room = Room(name="Vision Cascade", playground=True, vision=True)
 
 
 class VisionAgent(Agent):
@@ -39,15 +42,16 @@ class VisionAgent(Agent):
         )
 
     async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=TOPIC, cb=self.on_chat)
+        )
         await self.session.say("Hello, how can I help you today?")
 
-    async def on_message(self, message: RoomMessage) -> None:
-        if message.backlog:
-            return
-        if message.topic != TOPIC or message.text != "capture_frames":
+    async def on_chat(self, frame: dict, backlog: bool) -> None:
+        if backlog or str(frame.get("message") or "") != "capture_frames":
             return
 
-        logger.info("capturing frames on %r", message.topic)
+        logger.info("capturing frames on %r", TOPIC)
         await self.session.reply(
             "Please analyze this frame and describe what you see in details, "
             "within one line.",
@@ -61,12 +65,7 @@ class VisionAgent(Agent):
 def on_ready() -> None:
     zeroruntime.invoke(
         AGENT_ID,
-        room=Room(
-            name="Vision Cascade",
-            playground=True,
-            vision=True,
-            subscribe=[TOPIC],
-        ),
+        room=room,
     )
     logger.info(
         "publish 'capture_frames' on the %r topic to trigger a look", TOPIC)
