@@ -75,7 +75,7 @@ class MyVoiceAgent(Agent):
         await self.session.say("Goodbye!")
 
 
-async def on_ready() -> None:
+def on_ready() -> None:
     zeroruntime.invoke(AGENT_ID, room=Room(
         name="Realtime Pipeline Hooks", playground=True))
 
