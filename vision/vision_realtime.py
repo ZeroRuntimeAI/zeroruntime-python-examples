@@ -19,13 +19,7 @@ AGENT_ID = os.getenv("AGENT_ID", "vision-realtime-agent")
 TOPIC = "vision"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
-    """One frame on TOPIC, handed to whichever agent is running."""
-    await session.agent.on_chat(frame, backlog)
-
-
 room = Room(name="Vision Realtime", playground=True, vision=True)
-room.subscribe_to_pubsub(PubSubSubscribeConfig(topic=TOPIC, cb=on_pubsub_message))
 
 
 class VisionRealtimeAgent(Agent):
@@ -47,6 +41,9 @@ class VisionRealtimeAgent(Agent):
         )
 
     async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=TOPIC, cb=self.on_chat)
+        )
         await self.session.say("Hello! Show me something and I'll tell you what I see.")
 
     async def on_chat(self, frame: dict, backlog: bool) -> None:

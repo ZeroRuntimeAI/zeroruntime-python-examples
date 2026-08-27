@@ -74,7 +74,8 @@ PERSONAS = {
         # reads it on sonic-3+ and ignores it on earlier voices.
         tts=CartesiaTTS(
             model="sonic-3",
-            generation_config=GenerationConfig(speed=1.1, emotion="positivity"),
+            generation_config=GenerationConfig(
+                speed=1.1, emotion="positivity"),
         ),
         **_TUNING,
     ),
@@ -110,14 +111,7 @@ PERSONAS = {
 FIRST = "deepgram"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
-    """One frame on TOPIC, handed to whichever agent is running."""
-    await session.agent.on_chat(frame, backlog)
-
-
 room = Room(name="Persona Switch", playground=True)
-room.subscribe_to_pubsub(PubSubSubscribeConfig(
-    topic=TOPIC, cb=on_pubsub_message))
 
 
 class PersonaAgent(Agent):
@@ -138,6 +132,9 @@ class PersonaAgent(Agent):
         self._current = FIRST
 
     async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=TOPIC, cb=self.on_chat)
+        )
         await self.session.say(
             f"Hey! {PERSONAS[self._current]['name']} here -- what can I help with?"
         )

@@ -8,7 +8,7 @@ import os
 import zeroruntime
 from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
 from zeroruntime.inference import TurnDetector
-from zeroruntime.plugins import AnthropicLLM, DeepgramSTT, ElevenLabsTTS, SileroVAD
+from zeroruntime.plugins import GoogleLLM, DeepgramSTT, CartesiaTTS, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
@@ -21,14 +21,7 @@ AGENT_ID = os.getenv("AGENT_ID", "reply-interrupt-agent")
 TOPIC = "CHAT"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
-    """One frame on TOPIC, handed to whichever agent is running."""
-    await session.agent.on_chat(frame, backlog)
-
-
 room = Room(name="Reply / Interrupt", playground=True)
-room.subscribe_to_pubsub(PubSubSubscribeConfig(
-    topic=TOPIC, cb=on_pubsub_message))
 
 
 class ControllableAgent(Agent):
@@ -41,14 +34,17 @@ class ControllableAgent(Agent):
             agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
-                llm=AnthropicLLM(),
-                tts=ElevenLabsTTS(),
+                llm=GoogleLLM(),
+                tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
             ),
         )
 
     async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=TOPIC, cb=self.on_chat)
+        )
         await self.session.say("Hello, how can I help you today?")
 
     async def on_chat(self, frame: dict, backlog: bool) -> None:

@@ -19,14 +19,7 @@ AGENT_ID = os.getenv("AGENT_ID", "text-to-voice-agent")
 IN_TOPIC = "CHAT"
 
 
-async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
-    """One frame on IN_TOPIC, handed to whichever agent is running."""
-    await session.agent.on_chat(frame, backlog)
-
-
 room = Room(name="Text to Voice", playground=True)
-room.subscribe_to_pubsub(PubSubSubscribeConfig(
-    topic=IN_TOPIC, cb=on_pubsub_message))
 
 
 class TextToVoiceAgent(Agent):
@@ -41,8 +34,9 @@ class TextToVoiceAgent(Agent):
         )
 
     async def on_enter(self) -> None:
-        # Subscribing replays the topic's history, so the handler takes the
-        # backlog flag and ignores anything typed before the agent joined.
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=IN_TOPIC, cb=self.on_chat)
+        )
         await self.session.say("Hello. Type something and I will read my answer aloud.")
 
     async def on_chat(self, frame: dict, backlog: bool) -> None:

@@ -31,19 +31,6 @@ async def on_user_turn_start(transcript: str) -> None:
     logger.info("heard: %s", transcript)
 
 
-@pipeline.on("llm")
-async def on_llm(data: dict, session) -> None:
-    """The agent's answer. With no TTS this is the only output there is --
-    without publishing it somewhere, this agent would think in silence."""
-    text = (data or {}).get("text", "")
-    if not text.strip():
-        return
-    logger.info("answer: %s", text)
-    await session.publish_to_pubsub(
-        PubSubPublishConfig(topic=OUT_TOPIC, message=text)
-    )
-
-
 class VoiceToTextAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
@@ -57,6 +44,15 @@ class VoiceToTextAgent(Agent):
 
     async def on_enter(self) -> None:
         logger.info("listening")
+
+    async def on_llm(self, data: dict) -> None:
+        text = (data or {}).get("text", "")
+        if not text.strip():
+            return
+        logger.info("answer: %s", text)
+        await self.session.publish_to_pubsub(
+            PubSubPublishConfig(topic=OUT_TOPIC, message=text)
+        )
 
     async def on_exit(self) -> None:
         logger.info("call finished")

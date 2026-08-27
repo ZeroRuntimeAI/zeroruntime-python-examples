@@ -27,37 +27,9 @@ TOPIC = "CHAT"
 AGENT_ID = os.getenv("AGENT_ID", "chat-agent")
 
 
-async def on_pubsub_message(message: dict, backlog: bool, session) -> None:
-    """One frame on TOPIC, as the transport delivered it.
-
-    The third parameter is the live session, so this reaches the call without a
-    module-level lookup.
-    """
-    logger.info("Pubsub message received: %s", message)
-    text = str((message or {}).get("message") or "")
-    if text.strip():
-        await session.process_text(text)
-
-
-#: The room the agent joins, and the topic it listens on.
 room = Room(name="Chat Agent", playground=True)
-room.subscribe_to_pubsub(PubSubSubscribeConfig(topic=TOPIC, cb=on_pubsub_message))
 
 pipeline = Pipeline(stt=DeepgramSTT(), llm=GoogleLLM(), tts=CartesiaTTS())
-
-
-@pipeline.on("llm")
-async def post_reply(data: dict, session) -> None:
-    """Every answer the agent produces, echoed back into the chat.
-
-    A plain coroutine on ``llm`` is handed the finished answer, which is the
-    thing worth posting; an async generator would be handed the token stream.
-    """
-    text = str((data or {}).get("text") or "").strip()
-    if text:
-        await session.publish_to_pubsub(
-            PubSubPublishConfig(topic=TOPIC, message=text)
-        )
 
 
 class ChatAgent(Agent):
@@ -70,6 +42,14 @@ class ChatAgent(Agent):
             agent_id=AGENT_ID,
             pipeline=pipeline,
         )
+
+    async def on_llm(self, data: dict) -> None:
+        """Every answer the agent produces, echoed back into the chat."""
+        text = str((data or {}).get("text") or "").strip()
+        if text:
+            await self.session.publish_to_pubsub(
+                PubSubPublishConfig(topic=TOPIC, message=text)
+            )
 
     @function_tool
     async def send_chat_message(self, message: str) -> dict:
@@ -85,7 +65,17 @@ class ChatAgent(Agent):
         return {"status": "sent", "topic": TOPIC}
 
     async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=TOPIC, cb=self.on_chat)
+        )
         await self.session.say("Hi! Say something, or type in the room chat.")
+
+    async def on_chat(self, message: dict, backlog: bool) -> None:
+        """One frame on TOPIC, as the transport delivered it."""
+        logger.info("Pubsub message received: %s", message)
+        text = str((message or {}).get("message") or "")
+        if text.strip():
+            await self.session.process_text(text)
 
     async def on_participant_joined(self, participant: Participant) -> None:
         logger.info("joined: %s (%s)",

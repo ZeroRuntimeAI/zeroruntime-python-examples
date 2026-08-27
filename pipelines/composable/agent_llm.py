@@ -29,26 +29,7 @@ OUT_TOPIC = "AGENT_RESPONSE"
 pipeline = Pipeline(llm=GoogleLLM())
 
 
-@pipeline.on("llm")
-async def on_llm(data: dict, session) -> None:
-    """The agent's answer, as text. With no TTS this is the only output there is."""
-    text = (data or {}).get("text", "")
-    if not text.strip():
-        return
-    logger.info("agent: %s", text)
-    await session.publish_to_pubsub(
-        PubSubPublishConfig(topic=OUT_TOPIC, message=text)
-    )
-
-
-async def on_pubsub_message(frame: dict, backlog: bool, session) -> None:
-    """One frame on IN_TOPIC, handed to whichever agent is running."""
-    await session.agent.on_chat(frame, backlog)
-
-
 room = Room(name="LLM Only", playground=True)
-room.subscribe_to_pubsub(PubSubSubscribeConfig(
-    topic=IN_TOPIC, cb=on_pubsub_message))
 
 
 class LlmAgent(Agent):
@@ -59,6 +40,21 @@ class LlmAgent(Agent):
             ),
             agent_id=AGENT_ID,
             pipeline=pipeline,
+        )
+
+    async def on_enter(self) -> None:
+        await self.session.subscribe_to_pubsub(
+            PubSubSubscribeConfig(topic=IN_TOPIC, cb=self.on_chat)
+        )
+
+    async def on_llm(self, data: dict) -> None:
+        """The agent's answer, as text. With no TTS this is the only output there is."""
+        text = (data or {}).get("text", "")
+        if not text.strip():
+            return
+        logger.info("agent: %s", text)
+        await self.session.publish_to_pubsub(
+            PubSubPublishConfig(topic=OUT_TOPIC, message=text)
         )
 
     async def on_chat(self, frame: dict, backlog: bool) -> None:
