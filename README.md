@@ -125,6 +125,7 @@ Open it and talk to the agent. Ctrl-C to stop.
 | --- | --- |
 | `inference/zeroruntime_cascade.py` | The same cascade through the gateway, one credential |
 | `inference/zeroruntime_realtime.py` | A realtime model through the gateway, no vendor key |
+| `inference/zeroruntime_turn_echo_omni.py` | The echo-omni turn detector, which hears prosody as well as words |
 
 ### Tools
 
