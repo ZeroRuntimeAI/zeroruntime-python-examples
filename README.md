@@ -21,6 +21,7 @@ telephony/         phone-call control
 observability/     hooks, events, tracing, recording                    *
 vision/            showing the model what the camera sees
 avatars/           giving the agent a face                              *
+duplex/            OpenAI Live duplex model gpt-live-1 support            *
 ```
 
 `*` — some examples in these folders need an account, an extra package or a
@@ -193,3 +194,11 @@ Open it and talk to the agent. Ctrl-C to stop.
 | --- | --- |
 | `avatars/avatar_simli_cascade.py` | Giving a cascade agent a face, with Simli |
 | `avatars/avatar_anam_cascade.py` | The same slot, with Anam and a function tool |
+
+
+### Duplex
+
+| File | What it shows |
+| --- | --- |
+| `duplex/openai_live_delegate_llm.py` | Sending that reasoning to an LLM you choose instead |
+| `duplex/openai_live_restaurant_booking.py` | Booking a table, with a full slot that frees up mid-call |
