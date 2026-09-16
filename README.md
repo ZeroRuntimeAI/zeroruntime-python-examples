@@ -142,6 +142,7 @@ Open it and talk to the agent. Ctrl-C to stop.
 | File | What it shows |
 | --- | --- |
 | `context/agent_context_window.py` | Bounding a long call — summarise or truncate older turns |
+| `context/knowledge_base.py` | Answering from your uploaded documents, searched every turn |
 | `context/agent_memory.py` | Long-term memory across calls, searched and written per turn |
 | `context/handoffs/agent_sequential_handoff.py` | A tool that returns an Agent is the handoff |
 | `context/handoffs/cascade_to_realtime_handoff.py` | Swapping a live call onto a realtime model |
