@@ -19,13 +19,6 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = os.getenv("AGENT_ID", "knowledge-base")
 
-# Replace these with your own document ids, from the dashboard's knowledge page.
-KNOWLEDGE_IDS = [
-    doc_id.strip()
-    for doc_id in os.getenv("KNOWLEDGE_IDS", "<knowledge-id-1>,<knowledge-id-2>").split(",")
-    if doc_id.strip()
-]
-
 pipeline = Pipeline(
     stt=DeepgramSTT(model="nova-2"),
     llm=GoogleLLM(model="gemini-2.5-flash"),
@@ -33,7 +26,7 @@ pipeline = Pipeline(
     vad=SileroVAD(),
     turn_detector=TurnDetector(),
     knowledge_base=KnowledgeBase(
-        knowledge_ids=KNOWLEDGE_IDS,
+        knowledge_ids=["kb_id_1", "kb_id_2"],
         top_k=5,
         # A question the documents cannot answer is filed in the dashboard's open
         # questions; answering it there is what the next re-index picks up.
