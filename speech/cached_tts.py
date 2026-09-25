@@ -18,8 +18,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "cached-tts-agent")
-
 GREETING = "Hi, you've reached support. How can I help?"
 HOLD = "Let me check that for you, one moment."
 GOODBYE = "Thanks for calling. Goodbye."
@@ -66,7 +64,6 @@ class SupportAgent(Agent):
                 "You are a support agent. Answer questions about orders. Use "
                 "check_order_status rather than guessing."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
                 llm=GoogleLLM(),
@@ -96,7 +93,7 @@ class SupportAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(name="Cached TTS", playground=True))
+    zeroruntime.invoke(room=Room(name="Cached TTS", playground=True))
 
 
 if __name__ == "__main__":

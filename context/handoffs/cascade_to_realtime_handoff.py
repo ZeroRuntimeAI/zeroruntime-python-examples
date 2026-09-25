@@ -4,7 +4,6 @@
 
 import asyncio
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, function_tool
@@ -22,9 +21,6 @@ load_dotenv(override=True)
 
 
 logger = logging.getLogger(__name__)
-
-
-AGENT_ID = os.getenv("AGENT_ID", "support")
 
 
 def make_realtime_pipeline() -> Pipeline:
@@ -49,7 +45,6 @@ class SupportAgent(Agent):
                 "caller asks for faster or more natural responses, call "
                 "switch_to_realtime."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
                 llm=GoogleLLM(),
@@ -99,7 +94,7 @@ class SupportAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Cascade to Realtime", playground=True))
 
 

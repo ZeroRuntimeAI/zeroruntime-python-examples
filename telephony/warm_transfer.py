@@ -19,7 +19,6 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-AGENT_ID = "warm-transfer-agent"
 SUPERVISOR_JOIN_TIMEOUT = 120.0
 BRIEFING_TIMEOUT = 180.0
 TRANSFER_BUDGET = SUPERVISOR_JOIN_TIMEOUT + BRIEFING_TIMEOUT + 60.0
@@ -39,7 +38,6 @@ def _pipeline() -> Pipeline:
 class CustomerServiceAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
-            agent_id=AGENT_ID,
             instructions=(
                 "You are a helpful customer service agent. If the caller asks to "
                 "speak to a manager or supervisor, or their issue needs a human, "
@@ -109,8 +107,7 @@ class CustomerServiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    started = zeroruntime.invoke(
-        AGENT_ID, room=Room(name="Warm Transfer Demo", playground=True)
+    started = zeroruntime.invoke(room=Room(name="Warm Transfer Demo", playground=True)
     )
     print(f"room_id={started['room_id']} -- point a SIP call at this room")
 

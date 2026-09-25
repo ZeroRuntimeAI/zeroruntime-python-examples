@@ -2,9 +2,7 @@
 # component errors, recording state changes, and per-component latency metrics
 # as they are measured. You receive only the events you register for.
 
-
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
@@ -18,11 +16,9 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "pipeline-events")
-
 pipeline = Pipeline(
     stt=DeepgramSTT(model="nova-2"),
-    llm=GoogleLLM(model="gemini-2.5-flash"),
+    llm=GoogleLLM(model="gemini-3.5-flash"),
     tts=CartesiaTTS(),
     vad=SileroVAD(),
     turn_detector=TurnDetector(),
@@ -89,7 +85,6 @@ class WatchedAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
             instructions="You are a helpful assistant. Keep answers short.",
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -102,7 +97,6 @@ class WatchedAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(
-        AGENT_ID,
         room=Room(name="Pipeline Events", playground=True, recording=True),
     )
 

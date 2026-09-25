@@ -10,13 +10,10 @@ from zeroruntime.plugins import SileroVAD
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
-AGENT_ID = "zeroruntime-cascade-inference-agent"
-
 
 class VoiceAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
-            agent_id=AGENT_ID,
             instructions=(
                 "You are a helpful voice assistant that can answer questions "
                 "and help with tasks."
@@ -39,7 +36,7 @@ class VoiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(name="ZeroRuntime Cascade Inference", playground=True))
+    zeroruntime.invoke(room=Room(name="ZeroRuntime Cascade Inference", playground=True))
 
 
 if __name__ == "__main__":

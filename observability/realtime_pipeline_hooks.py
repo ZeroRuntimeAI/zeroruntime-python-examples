@@ -3,7 +3,6 @@
 # is discarded, so a slow one cannot stall a call.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
@@ -12,8 +11,6 @@ from zeroruntime.plugins import GeminiLiveConfig, GeminiRealtime
 
 logger = logging.getLogger(__name__)
 
-
-AGENT_ID = os.getenv("AGENT_ID", "realtime-hooks-agent")
 
 pipeline = Pipeline(
     realtime=GeminiRealtime(
@@ -64,7 +61,6 @@ class MyVoiceAgent(Agent):
                 "You are a helpful voice assistant that can answer questions and "
                 "help with tasks."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -76,7 +72,7 @@ class MyVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Realtime Pipeline Hooks", playground=True))
 
 

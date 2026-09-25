@@ -2,18 +2,12 @@
 # voice, a cloned voice, or a language its built-in voices do not cover. Its
 # ears are untouched, so this is still speech-to-speech on the way in.
 
-import os
-
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
 from zeroruntime.plugins import CartesiaTTS, GeminiLiveConfig, GeminiRealtime
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
-
-
-
-AGENT_ID = os.getenv("AGENT_ID", "hybrid-tts-agent")
 
 
 class HybridVoiceAgent(Agent):
@@ -23,7 +17,6 @@ class HybridVoiceAgent(Agent):
                 "You are a helpful voice assistant that can answer questions and "
                 "help with tasks."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
@@ -43,7 +36,7 @@ class HybridVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Hybrid TTS", playground=True))
 
 

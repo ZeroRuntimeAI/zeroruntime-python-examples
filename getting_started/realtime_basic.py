@@ -2,18 +2,12 @@
 # cascade_basic.py. Filling the realtime slot is what makes it a realtime
 # pipeline; the mode is inferred from the components, never declared.
 
-import os
-
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
 from zeroruntime.plugins import GeminiLiveConfig, GeminiRealtime
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
-
-
-
-AGENT_ID = os.getenv("AGENT_ID", "realtime-basicff")
 
 
 class MyVoiceAgent(Agent):
@@ -23,7 +17,6 @@ class MyVoiceAgent(Agent):
                 "You are a helpful voice assistant that can answer questions and "
                 "help with tasks."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
@@ -43,7 +36,7 @@ class MyVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Realtime Basic", playground=True))
 
 if __name__ == "__main__":

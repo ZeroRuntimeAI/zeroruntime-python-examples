@@ -9,13 +9,9 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-AGENT_ID = "cascade-basic-agent"
-
-
 class VoiceAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
-            agent_id=AGENT_ID,
             instructions=(
                 "You are a helpful voice assistant that can answer questions "
                 "and help with tasks."
@@ -47,7 +43,7 @@ class VoiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Cascade Basic", playground=True))
 
 

@@ -19,8 +19,6 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "background-audio-agent")
-
 #: Any file libav can decode -- wav, mp3, ogg, flac, m4a -- fetched by the
 #: runtime, so a URL it can reach rather than a path on this machine. Leave
 #: either unset to take the runtime's own default sound.
@@ -37,7 +35,6 @@ class VoiceAgent(Agent):
                 "control_background_music tool with action 'play'. To stop, use "
                 "the action 'stop'."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
                 llm=GoogleLLM(),
@@ -82,7 +79,6 @@ class VoiceAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(
-        AGENT_ID,
         room=Room(name="Background Audio", playground=True),
     )
 

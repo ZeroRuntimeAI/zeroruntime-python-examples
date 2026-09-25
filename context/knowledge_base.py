@@ -4,7 +4,6 @@
 # the model. The search runs in the runtime, so nothing here calls an API.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, KnowledgeBase, Pipeline, Room
@@ -17,11 +16,9 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "knowledge-base")
-
 pipeline = Pipeline(
     stt=DeepgramSTT(model="nova-2"),
-    llm=GoogleLLM(model="gemini-2.5-flash"),
+    llm=GoogleLLM(model="gemini-3.5-flash"),
     tts=CartesiaTTS(),
     vad=SileroVAD(),
     turn_detector=TurnDetector(),
@@ -43,7 +40,6 @@ class SupportAgent(Agent):
                 "and nothing else. When it does not cover the question, say so "
                 "and offer to pass the question on."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -55,7 +51,7 @@ class SupportAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(name="Knowledge Base", playground=True))
+    zeroruntime.invoke(room=Room(name="Knowledge Base", playground=True))
 
 
 if __name__ == "__main__":

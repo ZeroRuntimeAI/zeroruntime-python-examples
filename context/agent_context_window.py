@@ -3,7 +3,6 @@
 # verbatim. System messages, handoffs and config updates always survive.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, ContextWindow, Pipeline, Room
@@ -16,18 +15,16 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "context-window")
-
 pipeline = Pipeline(
     stt=DeepgramSTT(model="nova-2"),
-    llm=GoogleLLM(model="gemini-2.5-flash"),
+    llm=GoogleLLM(model="gemini-3.5-flash"),
     tts=CartesiaTTS(),
     vad=SileroVAD(),
     turn_detector=TurnDetector(),
     context_window=ContextWindow(
         max_tokens=1500,
         keep_recent_turns=4,
-        summary_llm=GoogleLLM(model="gemini-2.5-flash"),
+        summary_llm=GoogleLLM(model="gemini-3.5-flash"),
     ),
 )
 
@@ -45,7 +42,6 @@ class LongCallAgent(Agent):
                 "You are a patient support agent. The caller may talk for a long "
                 "time. Refer back to what they told you earlier."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -58,7 +54,7 @@ class LongCallAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Context Window", playground=True))
 
 

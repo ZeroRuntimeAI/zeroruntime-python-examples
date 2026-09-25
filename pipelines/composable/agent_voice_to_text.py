@@ -3,7 +3,6 @@
 # speaking into the room.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, PubSubPublishConfig, Room
@@ -15,7 +14,6 @@ load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
-AGENT_ID = os.getenv("AGENT_ID", "voice-to-text-agent")
 OUT_TOPIC = "AGENT_RESPONSE"
 
 pipeline = Pipeline(
@@ -38,7 +36,6 @@ class VoiceToTextAgent(Agent):
                 "You are a helpful assistant listening to a call. Answer "
                 "concisely in text."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -59,7 +56,7 @@ class VoiceToTextAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Voice to Text", playground=True))
     logger.info("speak in the room; answers arrive on %r", OUT_TOPIC)
 

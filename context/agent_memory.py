@@ -20,7 +20,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "agent-memory")
 USER_ID = os.getenv("MEM0_USER_ID", "demo-user")
 
 
@@ -130,7 +129,6 @@ class PersonalAssistant(Agent):
                 "know to make conversations feel personal. Keep responses short and "
                 "conversational."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -144,7 +142,7 @@ class PersonalAssistant(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Personal Assistant", playground=True))
 
 

@@ -2,9 +2,7 @@
 # model does the chaining from the instructions and the tool schemas alone;
 # every tool body runs in this process.
 
-
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, function_tool
@@ -16,9 +14,6 @@ load_dotenv(override=True)
 
 
 logger = logging.getLogger(__name__)
-
-
-AGENT_ID = os.getenv("AGENT_ID", "tool-chaining-agent")
 
 
 @function_tool
@@ -108,7 +103,6 @@ class ToolChainingAgent(Agent):
                 "step. Keep your final response concise and conversational "
                 "(2-3 sentences max)."
             ),
-            agent_id=AGENT_ID,
             tools=[get_weather, get_clothing_advice, get_activity_suggestion],
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
@@ -131,7 +125,7 @@ class ToolChainingAgent(Agent):
 
 
 def on_ready() -> None:
-    result = zeroruntime.invoke(AGENT_ID, room=Room(
+    result = zeroruntime.invoke(room=Room(
         name="Tool Chaining", playground=True))
 
 

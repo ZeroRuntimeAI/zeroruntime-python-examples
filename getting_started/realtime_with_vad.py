@@ -4,7 +4,6 @@
 # stops, which is what sharpens time to first byte (TTFB), and AICousticsDenoise
 # cleans the inbound stream before either of them sees it.
 
-import os
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
 from zeroruntime.inference import AICousticsDenoise
@@ -14,9 +13,6 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "realtime-basi-with-vad")
-
-
 class MyVoiceAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
@@ -24,7 +20,6 @@ class MyVoiceAgent(Agent):
                 "You are a helpful voice assistant that can answer questions and "
                 "help with tasks."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 llm=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
@@ -46,7 +41,7 @@ class MyVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Realtime Basic Vad", playground=True))
 
 if __name__ == "__main__":

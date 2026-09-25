@@ -2,8 +2,6 @@
 # composable pipelines. Which slots you fill decides what the agent can do; the
 # mode is inferred from them, never declared.
 
-import os
-
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
 from zeroruntime.inference import TurnDetector
@@ -13,10 +11,6 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-
-AGENT_ID = os.getenv("AGENT_ID", "multimodal-agent")
-
-
 class MultimodalAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
@@ -24,7 +18,6 @@ class MultimodalAgent(Agent):
                 "You are a helpful voice assistant that can answer questions and "
                 "help with tasks."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
                 llm=GoogleLLM(),
@@ -42,7 +35,7 @@ class MultimodalAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Multimodal Agent", playground=True))
 
 

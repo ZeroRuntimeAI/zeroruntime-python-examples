@@ -3,7 +3,6 @@
 # own replies back as new input.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import (
@@ -22,7 +21,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "llm-only-agent")
 IN_TOPIC = "CHAT"
 OUT_TOPIC = "AGENT_RESPONSE"
 
@@ -38,7 +36,6 @@ class LlmAgent(Agent):
             instructions=(
                 "You are a helpful assistant. Answer in text, concisely."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -73,7 +70,6 @@ class LlmAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(
-        AGENT_ID,
         room=room,
     )
     logger.info("publish text on %r; answers arrive on %r",

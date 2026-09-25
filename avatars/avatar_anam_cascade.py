@@ -18,7 +18,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "anam-avatar-agent")
 AVATAR_ID = os.getenv("ANAM_AVATAR_ID", "your-anam-avatar-id")
 
 
@@ -65,11 +64,10 @@ class AvatarVoiceAgent(Agent):
                 "replies short and conversational -- long monologues look wrong on "
                 "a talking head."
             ),
-            agent_id=AGENT_ID,
             tools=[get_weather],
             pipeline=Pipeline(
                 stt=DeepgramSTT(model="nova-2"),
-                llm=GoogleLLM(model="gemini-2.5-flash"),
+                llm=GoogleLLM(model="gemini-3.5-flash"),
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
@@ -87,7 +85,7 @@ class AvatarVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Anam Avatar", playground=True))
 
 

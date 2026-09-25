@@ -3,7 +3,6 @@
 # a hop to a realtime model and back -- keeping everything already said.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
@@ -31,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 
 TOPIC = "CHAT"
-AGENT_ID = os.getenv("AGENT_ID", "persona-switch")
 
 _VOICE = (
     "You are a general-purpose voice AI assistant powered by ZeroRuntime. "
@@ -126,7 +124,6 @@ class PersonaAgent(Agent):
         start = PERSONAS[FIRST]
         super().__init__(
             instructions=start["instructions"],
-            agent_id=AGENT_ID,
             pipeline=start["pipeline"],
         )
         self._current = FIRST
@@ -181,9 +178,7 @@ class PersonaAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(
-        AGENT_ID, room=room
-    )
+    zeroruntime.invoke(room=room)
 
 
 if __name__ == "__main__":

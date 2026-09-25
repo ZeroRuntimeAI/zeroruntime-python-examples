@@ -19,8 +19,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "mcp-agent")
-
 MCP_SERVER = Path(
     os.getenv("MCP_SERVER", Path(__file__).parent /
               "mcp_servers" / "current_time.py")
@@ -40,10 +38,9 @@ class MCPAgent(Agent):
                 "help with tasks. You have tools available -- use them rather than "
                 "guessing."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(model="nova-2"),
-                llm=GoogleLLM(model="gemini-2.5-flash"),
+                llm=GoogleLLM(model="gemini-3.5-flash"),
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
@@ -68,7 +65,7 @@ class MCPAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(name="MCP Agent", playground=True))
+    zeroruntime.invoke(room=Room(name="MCP Agent", playground=True))
 
 
 if __name__ == "__main__":

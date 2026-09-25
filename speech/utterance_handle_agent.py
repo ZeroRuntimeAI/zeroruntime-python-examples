@@ -14,15 +14,12 @@ load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
-AGENT_ID = "utterance-handle-agent"
-
 
 class VoiceAgent(Agent):
     """A voice agent demonstrating UtteranceHandle and interruption-aware tools."""
 
     def __init__(self) -> None:
         super().__init__(
-            agent_id=AGENT_ID,
             instructions=(
                 "You are a helpful voice assistant. You can answer questions and "
                 "fetch weather information using the 'get_weather' tool. You can "
@@ -76,7 +73,7 @@ class VoiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(name="Utterance Handle", playground=True))
+    zeroruntime.invoke(room=Room(name="Utterance Handle", playground=True))
 
 
 if __name__ == "__main__":

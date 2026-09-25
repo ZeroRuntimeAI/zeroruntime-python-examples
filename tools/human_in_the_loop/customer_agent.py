@@ -16,7 +16,6 @@ from zeroruntime.plugins import AnthropicLLM, DeepgramSTT, GoogleTTS, SileroVAD
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "customer-agent")
 SERVER = pathlib.Path(__file__).parent / "discord_mcp_server.py"
 
 HUMAN_TIMEOUT = float(os.getenv("HUMAN_REPLY_TIMEOUT", "300"))
@@ -32,7 +31,6 @@ class CustomerAgent(Agent):
                 "supervisor -- never estimate one. Tell the caller you are "
                 "checking before you call it, because the answer takes a moment."
             ),
-            agent_id=AGENT_ID,
             mcp_servers=[
                 MCPServerStdio(
                     executable_path=sys.executable,
@@ -59,7 +57,7 @@ class CustomerAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Customer Agent", playground=True))
 
 
