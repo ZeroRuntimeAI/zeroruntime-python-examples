@@ -2,9 +2,7 @@
 # directions and each specialist inherits the conversation. Each agent gets its
 # own pipeline instance, since a pipeline carries the hooks registered on it.
 
-
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, function_tool
@@ -16,9 +14,6 @@ load_dotenv(override=True)
 
 
 logger = logging.getLogger(__name__)
-
-
-AGENT_ID = os.getenv("AGENT_ID", "travel")
 
 
 def build_pipeline() -> Pipeline:
@@ -38,7 +33,6 @@ class BookingAgent(Agent):
                 "You are the booking specialist. Help the caller choose and "
                 "book flights and hotels."
             ),
-            agent_id="booking",
             pipeline=build_pipeline(),
             inherit_context=inherit_context,
         )
@@ -57,7 +51,6 @@ class TravelSupportAgent(Agent):
                 "You are travel support. Handle cancellations, delays, changes "
                 "and anything that has gone wrong with an existing trip."
             ),
-            agent_id="travel-support",
             pipeline=build_pipeline(),
             inherit_context=inherit_context,
         )
@@ -77,7 +70,6 @@ class TravelAgent(Agent):
                 "For booking a new trip, call transfer_to_booking. For a problem "
                 "with an existing trip, call transfer_to_travel_support."
             ),
-            agent_id=AGENT_ID,
             pipeline=build_pipeline(),
         )
 
@@ -103,7 +95,7 @@ class TravelAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(name="Multi Agent Switch", playground=True))
+    zeroruntime.invoke(room=Room(name="Multi Agent Switch", playground=True))
 
 
 if __name__ == "__main__":

@@ -3,7 +3,6 @@
 # records who moved them and why -- before the return, so it is inherited too.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, function_tool
@@ -14,9 +13,6 @@ load_dotenv(override=True)
 
 
 logger = logging.getLogger(__name__)
-
-
-AGENT_ID = os.getenv("AGENT_ID", "intake")
 
 
 def build_pipeline() -> Pipeline:
@@ -44,7 +40,6 @@ class BillingAgent(Agent):
                 "You are the billing specialist. Resolve charge disputes, "
                 "payment questions, and refunds."
             ),
-            agent_id="billing",
             pipeline=build_pipeline(),
             inherit_context=inherit_context,
         )
@@ -78,7 +73,6 @@ class IntakeAgent(Agent):
                 "needs. If it is about a charge, a payment or a refund, call "
                 "transfer_to_billing with a short reason."
             ),
-            agent_id=AGENT_ID,
             pipeline=build_pipeline(),
         )
 
@@ -105,7 +99,7 @@ class IntakeAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Sequential Handoff", playground=True))
 
 

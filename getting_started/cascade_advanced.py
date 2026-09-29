@@ -2,8 +2,6 @@
 # decides when the caller has finished speaking, interruption config decides
 # when a barge-in stops the agent. Also shows an uninterruptible utterance.
 
-import os
-
 import zeroruntime
 from zeroruntime import Agent, EOUConfig, InterruptConfig, Pipeline, Room
 from zeroruntime.inference import TurnDetector
@@ -11,10 +9,6 @@ from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
-
-
-
-AGENT_ID = os.getenv("AGENT_ID", "cascade-advanced")
 
 
 class VoiceAgent(Agent):
@@ -57,7 +51,7 @@ class VoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Cascade Advanced", playground=True))
 
 

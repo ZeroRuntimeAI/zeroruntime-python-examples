@@ -17,7 +17,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "observability-agent")
 OTLP_URL = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "")
 
 pipeline = Pipeline(
@@ -58,7 +57,6 @@ class MyVoiceAgent(Agent):
             instructions=(
                 "You are a helpful voice assistant that can answer questions."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -87,7 +85,6 @@ class MyVoiceAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(
-        AGENT_ID,
         room=Room(
             name="Observability Hooks",
             playground=True,

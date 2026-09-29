@@ -1,7 +1,6 @@
 
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import (
@@ -24,8 +23,6 @@ logger = logging.getLogger(__name__)
 
 TOPIC = "CHAT"
 
-AGENT_ID = os.getenv("AGENT_ID", "chat-agent")
-
 
 room = Room(name="Chat Agent", playground=True)
 
@@ -39,7 +36,6 @@ class ChatAgent(Agent):
                 "You are a helpful assistant in a room's text chat. You can post "
                 "messages to the room's chat when asked. Keep replies short."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -91,7 +87,7 @@ class ChatAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID)
+    zeroruntime.invoke()
 
 
 if __name__ == "__main__":

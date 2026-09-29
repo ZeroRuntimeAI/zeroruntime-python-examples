@@ -10,13 +10,9 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-AGENT_ID = "call-transfer-agent"
-
-
 class CallTransferAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
-            agent_id=AGENT_ID,
             instructions=(
                 "You are the Call Transfer Agent which helps transfer an ongoing "
                 "call to a new number. Use the transfer_call tool to transfer."
@@ -50,7 +46,7 @@ class CallTransferAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Call Transfer Agent", playground=True))
 
 

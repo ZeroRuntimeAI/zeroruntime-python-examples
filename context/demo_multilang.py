@@ -20,9 +20,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-
-AGENT_ID = os.getenv("AGENT_ID", "multilang-loan-advisor")
-
 _BASE_PROMPT = (
     "You are a business loan advisor. Help the caller understand loan products, "
     "check eligibility, and work out an EMI. Use the tools rather than "
@@ -146,11 +143,10 @@ class MultilangLoanAgent(Agent):
         self.lang = LANG
         super().__init__(
             instructions=_instructions(CFG),
-            agent_id=AGENT_ID,
             tools=[get_loan_products, calculate_emi, check_eligibility],
             pipeline=Pipeline(
                 stt=SarvamAISTT(model="saaras:v3", language=CFG["code"]),
-                llm=GoogleLLM(model="gemini-2.5-flash"),
+                llm=GoogleLLM(model="gemini-3.5-flash"),
                 tts=SarvamAITTS(model="bulbul:v3", language=CFG["code"]),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
@@ -193,8 +189,7 @@ class MultilangLoanAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(
-        AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
             name=f"Loan Advisor ({CFG['label']})", playground=True)
     )
 

@@ -16,8 +16,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "translator-agent")
-
 current_language = "en-IN"
 
 session: "zeroruntime.Session | None" = None
@@ -89,7 +87,6 @@ class TranslatorAgent(Agent):
                 "You are a helpful translator assistant that can speak to the user "
                 "in their language."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -102,7 +99,7 @@ class TranslatorAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Translator Agent", playground=True))
 
 

@@ -3,7 +3,6 @@
 # subscribes the agent to the track; only the frame count crosses the wire.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
@@ -15,7 +14,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "vision-realtime-agent")
 TOPIC = "vision"
 
 
@@ -29,7 +27,6 @@ class VisionRealtimeAgent(Agent):
                 "You are a helpful voice assistant that can see. Describe what "
                 "you are shown briefly and naturally."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
@@ -63,7 +60,6 @@ class VisionRealtimeAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(
-        AGENT_ID,
         room=room,
     )
     logger.info(

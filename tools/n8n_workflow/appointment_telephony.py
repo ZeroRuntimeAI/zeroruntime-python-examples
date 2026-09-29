@@ -14,7 +14,6 @@ from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "appointment-agent")
 N8N_URL = os.getenv(
     "N8N_MCP_URL", "https://your-n8n-instance/mcp/your-trigger-id")
 
@@ -35,7 +34,6 @@ class AppointmentAgent(Agent):
 
         super().__init__(
             instructions=INSTRUCTIONS,
-            agent_id=AGENT_ID,
             mcp_servers=[
                 MCPServerHTTP(
                     endpoint_url=N8N_URL,
@@ -50,7 +48,7 @@ class AppointmentAgent(Agent):
             ],
             pipeline=Pipeline(
                 stt=DeepgramSTT(model="nova-2"),
-                llm=GoogleLLM(model="gemini-2.5-flash"),
+                llm=GoogleLLM(model="gemini-3.5-flash"),
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
@@ -72,7 +70,7 @@ class AppointmentAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Restaurant Agent", playground=True))
 
 

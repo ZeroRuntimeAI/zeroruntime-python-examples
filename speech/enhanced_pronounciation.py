@@ -3,7 +3,6 @@
 # crosses the wire per chunk and the turn pays nothing for them.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, PronunciationRule, Room
@@ -15,8 +14,6 @@ load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
-
-AGENT_ID = os.getenv("AGENT_ID", "enhanced-pronounciation")
 
 RULES = [
     PronunciationRule("nginx", "engine x"),
@@ -33,7 +30,7 @@ RULES = [
 
 pipeline = Pipeline(
     stt=DeepgramSTT(model="nova-2"),
-    llm=GoogleLLM(model="gemini-2.5-flash"),
+    llm=GoogleLLM(model="gemini-3.5-flash"),
     tts=CartesiaTTS(),
     vad=SileroVAD(),
     pronunciations=RULES,
@@ -47,7 +44,6 @@ class DocsAgent(Agent):
                 "You are a developer support agent. Answer questions about APIs, "
                 "HTTP, JSON and SQL. Keep answers short and conversational."
             ),
-            agent_id=AGENT_ID,
             pipeline=pipeline,
         )
 
@@ -59,7 +55,7 @@ class DocsAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(name="Pronunciation", playground=True))
+    zeroruntime.invoke(room=Room(name="Pronunciation", playground=True))
 
 
 if __name__ == "__main__":

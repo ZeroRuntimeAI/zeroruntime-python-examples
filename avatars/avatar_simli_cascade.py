@@ -17,7 +17,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "simli-avatar-agent")
 FACE_ID = os.getenv("SIMLI_FACE_ID", "your-simli-face-id")
 
 
@@ -31,10 +30,9 @@ class AvatarAgent(Agent):
                 "You are a friendly assistant with a face. Keep replies short and "
                 "conversational -- long monologues look wrong on a talking head."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 stt=DeepgramSTT(model="nova-2"),
-                llm=GoogleLLM(model="gemini-2.5-flash"),
+                llm=GoogleLLM(model="gemini-3.5-flash"),
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector(),
@@ -57,7 +55,7 @@ class AvatarAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Simli Avatar", playground=True))
 
 

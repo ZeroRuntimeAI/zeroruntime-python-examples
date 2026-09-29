@@ -2,7 +2,6 @@
 # and no VAD, because the input is typed rather than spoken.
 
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, PubSubSubscribeConfig, Room
@@ -15,7 +14,6 @@ load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 
-AGENT_ID = os.getenv("AGENT_ID", "text-to-voice-agent")
 IN_TOPIC = "CHAT"
 
 
@@ -29,7 +27,6 @@ class TextToVoiceAgent(Agent):
                 "You are a helpful assistant. Keep spoken answers short -- they "
                 "are read aloud."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(llm=GoogleLLM(), tts=CartesiaTTS()),
         )
 
@@ -53,7 +50,6 @@ class TextToVoiceAgent(Agent):
 
 def on_ready() -> None:
     zeroruntime.invoke(
-        AGENT_ID,
         room=room,
     )
     logger.info(

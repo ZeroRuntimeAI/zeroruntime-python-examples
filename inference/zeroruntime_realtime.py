@@ -2,17 +2,11 @@
 # the realtime counterpart to zeroruntime_cascade.py. The gateway class flattens
 # the arguments the direct plugin nests; they are not the same class.
 
-import os
-
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room
 from zeroruntime.inference import GeminiRealtime
 from dotenv import load_dotenv
 load_dotenv(override=True)
-
-
-
-AGENT_ID = os.getenv("AGENT_ID", "zeroruntime-realtime-inference-agent")
 
 
 class MyVoiceAgent(Agent):
@@ -22,7 +16,6 @@ class MyVoiceAgent(Agent):
                 "You are a helpful voice assistant that can answer questions and "
                 "help with tasks."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-2.5-flash-native-audio-preview-12-2025",
@@ -42,8 +35,7 @@ class MyVoiceAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(
-        AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
             name="ZeroRuntime Realtime Inference", playground=True)
     )
 

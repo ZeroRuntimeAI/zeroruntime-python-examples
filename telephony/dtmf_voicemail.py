@@ -10,13 +10,9 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-AGENT_ID = "dtmf-voicemail-agent"
-
-
 class VoiceAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
-            agent_id=AGENT_ID,
             instructions="You are a helpful voice assistant that can answer questions.",
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
@@ -46,7 +42,7 @@ class VoiceAgent(Agent):
 
 
 def invoke_agent() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="DTMF Voicemail", playground=True))
 
 

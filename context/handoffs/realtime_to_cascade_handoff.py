@@ -4,7 +4,6 @@
 
 import asyncio
 import logging
-import os
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, function_tool
@@ -23,14 +22,12 @@ load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
-AGENT_ID = os.getenv("AGENT_ID", "realtime-support")
-
 
 def make_cascade_pipeline() -> Pipeline:
     """The whole pipeline. Every slot named -- omitting one empties it."""
     return Pipeline(
         stt=DeepgramSTT(model="nova-2"),
-        llm=GoogleLLM(model="gemini-2.5-flash"),
+        llm=GoogleLLM(model="gemini-3.5-flash"),
         tts=CartesiaTTS(),
         vad=SileroVAD(),
         turn_detector=TurnDetector(),
@@ -47,7 +44,6 @@ class RealtimeSupportAgent(Agent):
                 "voice, or for a cheaper or more configurable mode, call "
                 "switch_to_cascade."
             ),
-            agent_id=AGENT_ID,
             pipeline=Pipeline(
                 realtime=GeminiRealtime(
                     model="gemini-3.1-flash-live-preview",
@@ -88,7 +84,7 @@ class RealtimeSupportAgent(Agent):
 
 
 def on_ready() -> None:
-    zeroruntime.invoke(AGENT_ID, room=Room(
+    zeroruntime.invoke(room=Room(
         name="Realtime to Cascade", playground=True))
 
 
