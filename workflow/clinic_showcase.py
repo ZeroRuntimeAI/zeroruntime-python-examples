@@ -1,15 +1,20 @@
-# Sunrise Clinic's appointment line: a workflow of two subagents.
+# Sunrise Clinic's appointment line: a main agent, then two subagents with workflows.
 #
+#   Clinic       greets on its pipeline, and hands the caller to intake
 #   Intake       name -> reason -> referral (specialists only) -> insurance (optional)
 #   Scheduling   slot -> confirm
 #
 # Each step's answer is a dataclass. A tool checks what the caller said and calls
-# self.complete(Answer(...)); the runtime then moves to the next step, and on to
-# the next subagent once on_exit says so.
+# self.complete(Answer(...)); the runtime then moves to the next step. Nothing moves
+# the call between subagents on its own: on_exit hands it on with transfer_to(Scheduling()).
+#
+# The call starts on the agent you serve, Clinic, and switches to each subagent's own
+# pipeline as it takes the call.
 #
 #   python clinic_showcase.py
 
 import asyncio
+import logging
 from dataclasses import dataclass
 
 from dotenv import load_dotenv
@@ -17,10 +22,12 @@ from dotenv import load_dotenv
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, Step, SubAgent, function_tool
 from zeroruntime.inference import TurnDetector
-from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
-from zeroruntime.workflow import on_workflow, workflow_status
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, ElevenLabsTTS, GoogleLLM, SarvamAITTS, SileroVAD
+from zeroruntime.workflow import on_workflow
 
 load_dotenv(override=True)
+
+logger = logging.getLogger(__name__)
 
 VISITS = ("checkup", "illness", "specialist")
 SPECIALTIES = ("cardiology", "dermatology", "orthopaedics")
@@ -69,6 +76,13 @@ class Confirmation:
 class Intake(SubAgent):
     name = "intake"
     instructions = "You're the clinic's front desk. Ask one thing at a time, and keep it short and kind."
+    pipeline = Pipeline(
+        stt=DeepgramSTT(),
+        llm=GoogleLLM(),
+        tts=SarvamAITTS(),
+        vad=SileroVAD(),
+        turn_detector=TurnDetector(),
+    )
     workflow = [
         Step(
             id="name",
@@ -105,9 +119,6 @@ class Intake(SubAgent):
     ]
 
     async def on_enter(self, reason: str):
-        if reason == "call started":
-            name = self.userdata.get("caller_name", "the caller")  # from invoke(metadata=...)
-            return f"Greet {name} as Sunrise Clinic, and say you'll get them booked in."
         if reason == "caller changed the visit":  # sent back from scheduling by change_visit
             return "Say of course. If they've already said what they'd like instead, record it; otherwise ask."
         return None
@@ -167,19 +178,32 @@ class Intake(SubAgent):
         return await self.go_to_step(step_id, reason="caller correction")
 
     async def on_exit(self):
-        # All steps done: on to scheduling.
-        return await self.transfer_to("scheduling", reason="intake complete")
+        # Its steps are done: on to scheduling. Without this, the call stays here.
+        return await self.transfer_to(Scheduling(), reason="intake complete")
 
     async def on_step_failed(self, step_id: str, reason: str):
         # max_attempts reached: book a general checkup instead.
-        return await self.transfer_to("scheduling", reason="general checkup")
+        return await self.transfer_to(Scheduling(), reason="general checkup")
+
+    @function_tool
+    async def end_call(self) -> dict:
+        """End the call when the caller wants to stop."""
+        asyncio.create_task(self.hangup(reason="caller done"))
+        return {"status": "ending_call"}
 
 
 # Scheduling: pick a time and confirm it
 
 class Scheduling(SubAgent):
     name = "scheduling"
-    instructions = "You book the appointment. Offer the slots find_slots returns, never others."
+    instructions = "You book the appointment. Offer the slots find_slots returns, never others. Once the caller has nothing else, call end_call."
+    pipeline = Pipeline(
+        stt=DeepgramSTT(),
+        llm=GoogleLLM(),
+        tts=ElevenLabsTTS(),
+        vad=SileroVAD(),
+        turn_detector=TurnDetector(),
+    )
     workflow = [
         Step(
             id="slot",
@@ -244,44 +268,49 @@ class Scheduling(SubAgent):
 
     @on_workflow("step_end")
     def track(self, data: dict) -> None:
-        self.log.info("%s.%s done; to do: %s", data["agent"], data["step"], data["progress"]["to_do"])
+        logger.info("%s.%s done; to do: %s", data["agent"], data["step"], data["progress"]["to_do"])
 
     async def on_exit(self):
+        # Its steps are done and it moves the call nowhere, so it stays here. As the call
+        # ends, this line is the goodbye.
         return "Thanks for calling Sunrise Clinic. See you soon."
 
+    @function_tool
+    async def end_call(self) -> dict:
+        """End the call when the caller says goodbye or has nothing else."""
+        asyncio.create_task(self.hangup(reason="caller done"))
+        return {"status": "ending_call"}
 
-EVENTS = ("agent_handoff", "step_start", "step_end", "step_back", "step_failed")
 
+# The main agent, the one you serve: the call starts here
 
 class Clinic(Agent):
     def __init__(self) -> None:
         super().__init__(
-            instructions="You answer the phone at Sunrise Clinic. This is a phone call: a sentence or two at a time. "
-                         "Once the caller has nothing else, call end_call.",
+            instructions="You answer the phone at Sunrise Clinic. Greet the caller, then call to_intake.",
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
                 llm=GoogleLLM(),
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector()),
-            tools=[workflow_status],  # with Clinic's own methods, every subagent has these
-            subagents=[Intake(), Scheduling()],  # the first one opens the call
         )
-        for event in EVENTS:
+        for event in ("agent_handoff", "step_start", "step_end", "step_back", "step_failed"):
             self.on(event, print)
 
-    @function_tool
-    async def end_call(self) -> dict:
-        """End the call when the user asks to hang up or says goodbye."""
-        asyncio.create_task(self._announce_and_hangup())
-        return {"status": "ending_call"}
+    async def on_enter(self):
+        logger.info("call started for %s", self.userdata.get("caller_name", "a caller"))
+        await self.session.say("Hello, welcome to Sunrise Clinic! I'll get you booked in today.")
+        return "Call to_intake now, without saying anything."
 
-    async def _announce_and_hangup(self) -> None:
-        await self.session.interrupt()
-        await asyncio.sleep(1)
-        handle = await self.session.say("Have a nice day!", interruptible=False)
-        await handle
-        await self.hangup(farewell="Goodbye!")
+    async def on_exit(self):
+        # The call is ending.
+        logger.info("call over")
+
+    @function_tool
+    async def to_intake(self) -> dict:
+        """Hand the caller to intake to take their details."""
+        return await self.transfer_to(Intake(), reason="new caller")
 
 
 def on_ready() -> None:

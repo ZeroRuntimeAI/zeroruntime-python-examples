@@ -1,66 +1,49 @@
-# A support line of three subagents and no steps: reception finds out what the
-# caller needs and hands them to billing or tech support, who can hand them on.
+# Subagents with no workflow: the desk, the agent you serve, answers the call and
+# hands the caller to billing or tech support, who can hand them on or back.
 #
-# Without steps, a subagent is just its own instructions and tools: it talks
-# until one of its tools moves the call with transfer_to. Every subagent can
-# transfer to every other; the first one opens the call.
+# A SubAgent is its own instructions and tools, talking until a tool moves the call
+# with transfer_to(Billing()). With no workflow on the call each transfer is a plain
+# agent handoff, which any runtime runs. The call starts on the desk's pipeline and
+# switches to each subagent's own as it takes the call, then the caller hears it speak.
 #
 #   python support_desk.py
 
 import asyncio
+import logging
 
 from dotenv import load_dotenv
 
 import zeroruntime
 from zeroruntime import Agent, Pipeline, Room, SubAgent, function_tool
 from zeroruntime.inference import TurnDetector
-from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD
+from zeroruntime.plugins import CartesiaTTS, DeepgramSTT, ElevenLabsTTS, GoogleLLM, SarvamAITTS, SileroVAD
 
 load_dotenv(override=True)
+
+logger = logging.getLogger(__name__)
 
 INVOICES = {"INV-1001": {"amount": 1499, "status": "paid"}, "INV-1002": {"amount": 2999, "status": "due"}}
 SERVICES = {"internet": "running", "email": "slow in your region; a fix is due within the hour", "tv": "running"}
 
 
-class Reception(SubAgent):
-    name = "reception"
-    instructions = (
-        "You're the front desk of Nimbus Telecom. Find out, in a sentence or two, whether the caller "
-        "needs help with a bill or with a service that isn't working, then hand them over."
+class Billing(SubAgent):
+    name = "billing"
+    instructions = "You handle invoices and payments. Only quote what look_up_invoice returned. " \
+                   "If they have nothing else, call end_call."
+    pipeline = Pipeline(
+        stt=DeepgramSTT(),
+        llm=GoogleLLM(),
+        tts=ElevenLabsTTS(),
+        vad=SileroVAD(),
+        turn_detector=TurnDetector(),
     )
 
     async def on_enter(self, reason: str):
-        if reason == "call started":
-            name = self.userdata.get("caller_name", "the caller")  # from invoke(metadata=...)
-            return f"Greet {name} as Nimbus Telecom, and ask how you can help."
-        return "Ask what else you can help with."
-
-    @function_tool
-    async def to_billing(self, summary: str) -> dict:
-        """Hand the caller to billing: invoices, payments, refunds.
-
-        Args:
-            summary: What they need, in a few words.
-        """
-        return await self.transfer_to("billing", reason=summary)
-
-    @function_tool
-    async def to_tech_support(self, summary: str) -> dict:
-        """Hand the caller to tech support: a service that's down, slow or misbehaving.
-
-        Args:
-            summary: What's wrong, in a few words.
-        """
-        return await self.transfer_to("tech_support", reason=summary)
-
-
-class Billing(SubAgent):
-    name = "billing"
-    instructions = "You handle invoices and payments. Only quote what look_up_invoice returned."
-
-    async def on_enter(self, reason: str):
-        # reason is what reception passed on: the caller isn't asked to repeat it.
+        # reason is what the desk passed on: the caller isn't asked to repeat it.
         return f"Say you're in billing and can help with: {reason}. Ask for their invoice number."
+
+    async def on_exit(self):
+        logger.info("call ended in billing")
 
     @function_tool
     async def look_up_invoice(self, invoice_id: str) -> dict:
@@ -75,9 +58,9 @@ class Billing(SubAgent):
         return {"invoice_id": invoice_id.upper(), **invoice}
 
     @function_tool
-    async def back_to_reception(self) -> dict:
+    async def back_to_desk(self) -> dict:
         """The caller needs something billing doesn't handle."""
-        return await self.transfer_to("reception", reason="needs something else")
+        return await self.transfer_to("desk", reason="needs something else")
 
     @function_tool
     async def to_tech_support(self, summary: str) -> dict:
@@ -86,15 +69,32 @@ class Billing(SubAgent):
         Args:
             summary: What's wrong, in a few words.
         """
-        return await self.transfer_to("tech_support", reason=summary)
+        return await self.transfer_to(TechSupport(), reason=summary)
+
+    @function_tool
+    async def end_call(self) -> dict:
+        """End the call when the caller says goodbye or has nothing else."""
+        asyncio.create_task(self.hangup(reason="caller done"))
+        return {"status": "ending_call"}
 
 
 class TechSupport(SubAgent):
     name = "tech_support"
-    instructions = "You fix service problems. Check the service's status before suggesting anything."
+    instructions = "You fix service problems. Check the service's status before suggesting anything. " \
+                   "If they have nothing else, call end_call."
+    pipeline = Pipeline(
+        stt=DeepgramSTT(),
+        llm=GoogleLLM(),
+        tts=SarvamAITTS(),
+        vad=SileroVAD(),
+        turn_detector=TurnDetector(),
+    )
 
     async def on_enter(self, reason: str):
         return f"Say you're in tech support and can look into: {reason}. Ask which service it is if they haven't said."
+
+    async def on_exit(self):
+        logger.info("call ended in tech support")
 
     @function_tool
     async def check_status(self, service: str) -> dict:
@@ -110,28 +110,58 @@ class TechSupport(SubAgent):
         return {"service": service.lower(), "status": status}
 
     @function_tool
-    async def back_to_reception(self) -> dict:
+    async def back_to_desk(self) -> dict:
         """The caller needs something tech support doesn't handle."""
-        return await self.transfer_to("reception", reason="needs something else")
+        return await self.transfer_to("desk", reason="needs something else")
+
+    @function_tool
+    async def end_call(self) -> dict:
+        """End the call when the caller says goodbye or has nothing else."""
+        asyncio.create_task(self.hangup(reason="caller done"))
+        return {"status": "ending_call"}
 
 
 class Desk(Agent):
     def __init__(self) -> None:
         super().__init__(
-            instructions="You answer the phone at Nimbus Telecom. This is a phone call: a sentence or two at a time. "
-                         "Once the caller has nothing else, call end_call.",
+            instructions="You're Nimbus Telecom's front desk. Find out, in a sentence or two, whether the caller "
+                         "needs help with a bill or with a service that isn't working, then hand them over. "
+                         "If they have nothing else, call end_call.",
             pipeline=Pipeline(
                 stt=DeepgramSTT(),
                 llm=GoogleLLM(),
                 tts=CartesiaTTS(),
                 vad=SileroVAD(),
                 turn_detector=TurnDetector()),
-            subagents=[Reception(), Billing(), TechSupport()],  # reception opens the call
-            farewell="Thanks for calling Nimbus Telecom. Have a good day.",  # whichever subagent ends the call
         )
         self.on("agent_handoff", print)
 
-    # The agent's own tool methods are shared: every subagent can call them.
+    async def on_enter(self, reason: str):
+        if reason == "call started":
+            name = self.userdata.get("caller_name", "the caller")  # from invoke(metadata=...)
+            return f"Greet {name} as Nimbus Telecom, and ask how you can help."
+        return "Ask what else you can help with."
+
+    async def on_exit(self):
+        logger.info("call ended at the desk")
+
+    @function_tool
+    async def to_billing(self, summary: str) -> dict:
+        """Hand the caller to billing: invoices, payments, refunds.
+
+        Args:
+            summary: What they need, in a few words.
+        """
+        return await self.transfer_to(Billing(), reason=summary)
+
+    @function_tool
+    async def to_tech_support(self, summary: str) -> dict:
+        """Hand the caller to tech support: a service that's down, slow or misbehaving.
+
+        Args:
+            summary: What's wrong, in a few words.
+        """
+        return await self.transfer_to(TechSupport(), reason=summary)
 
     @function_tool
     async def end_call(self) -> dict:
