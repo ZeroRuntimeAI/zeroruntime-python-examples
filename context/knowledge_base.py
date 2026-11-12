@@ -25,9 +25,6 @@ pipeline = Pipeline(
     knowledge_base=KnowledgeBase(
         knowledge_ids=["kb_id_1", "kb_id_2"],
         top_k=5,
-        # A question the documents cannot answer is filed in the dashboard's open
-        # questions; answering it there is what the next re-index picks up.
-        report_unanswered=True,
     ),
 )
 
