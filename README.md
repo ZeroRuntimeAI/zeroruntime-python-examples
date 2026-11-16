@@ -22,6 +22,7 @@ observability/     hooks, events, tracing, recording                    *
 vision/            showing the model what the camera sees
 avatars/           giving the agent a face                              *
 duplex/            OpenAI Live duplex model gpt-live-1 support            *
+distributed-agents/       one call across agents in separate processes            *
 ```
 
 `*` — some examples in these folders need an account, an extra package or a
