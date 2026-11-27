@@ -120,6 +120,7 @@ Open it and talk to the agent. Ctrl-C to stop.
 | `pipelines/hybrid/hybrid_custom_stt_realtime.py` | Your transcriber in front of a realtime model |
 | `pipelines/hybrid/hybrid_realtime_custom_tts.py` | A realtime model with your voice on the output |
 | `pipelines/fallback_recovery.py` | A pipeline slot as a list — head serves, tail stands by |
+| `pipelines/guardrails.py` | Input, output and regex rules on a cascade agent, checked by a judge LLM |
 
 ### ZeroRuntime inference
 
